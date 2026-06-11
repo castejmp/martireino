@@ -161,19 +161,17 @@ h1.title{font-family:'Cormorant Garamond';font-weight:700;line-height:.9;margin:
 .fig .fn{font-family:'Cormorant Garamond';font-weight:600;font-size:14px;line-height:1;margin-top:7px;color:#fff;position:relative}
 .fig .fm{font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-top:4px;position:relative}
 .fig .no{position:absolute;top:6px;left:8px;font-size:9px;font-weight:800;color:var(--muted-2);z-index:2}
-.fig .st{position:absolute;top:5px;right:7px;font-size:10px;z-index:2;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
+.fig .st{position:absolute;top:6px;right:7px;font-size:8px;letter-spacing:1px;z-index:2;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
 .fig.have:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 56%,rgba(227,184,95,.1));pointer-events:none}
-.fig.r-rara{box-shadow:inset 0 0 0 1px rgba(241,168,198,.35)}
-.fig.r-epica{box-shadow:inset 0 0 0 1px rgba(246,221,153,.55)}
+.fig.r-rara{box-shadow:inset 0 0 0 1px rgba(191,230,212,.4)}
+.fig.r-epica{box-shadow:inset 0 0 0 1px rgba(199,155,255,.5)}
 .fig .dq{position:absolute;bottom:6px;right:6px;background:linear-gradient(180deg,var(--rose),var(--rose-deep));
   color:#3a0f23;font-size:9px;font-weight:900;border-radius:8px;padding:2px 6px;z-index:2}
 .fig.pop{animation:pop .5s ease}
 @keyframes pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1)}}
 
-.goldrow{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.goldrow .gcard .glyph{font-size:21px}
-.goldrow .gcard .fn{font-size:9.5px;margin-top:4px}
-.goldrow .gcard .lk{font-size:10px;top:5px;right:6px}
+.goldrow{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.gcard .no{position:absolute;top:6px;left:8px;font-size:9px;font-weight:800;color:var(--muted-2)}
 .gcard{aspect-ratio:.72;border-radius:15px;position:relative;overflow:hidden;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:8px;
   background:linear-gradient(165deg,#2c2143,#191130);border:1px solid var(--line)}
@@ -276,26 +274,40 @@ h1.title{font-family:'Cormorant Garamond';font-weight:700;line-height:.9;margin:
   background:repeating-linear-gradient(45deg,rgba(213,13,162,.09) 0 9px,transparent 9px 18px),
     linear-gradient(165deg,#241a4d,#140d31);
   border:1px solid rgba(255,255,255,.12)}
+/* Marcos según rareza, imitando los impresos:
+   Común marfil+dorado · Especial lila+plata · Legendaria violeta+oro · Dorada foil */
 .bcface.bk{transform:rotateY(180deg);padding:7px;
-  background:linear-gradient(160deg,#dfe6ef,#9aa7b8 30%,#e8edf3 52%,#8d99ab 75%,#d4dce6)}
-.bigcard.r-rara .bcface.bk{background:linear-gradient(160deg,#f6cfde,#d987ab 30%,#fbe3ec 52%,#c8769d 75%,#f3c4d6)}
-.bigcard.r-epica .bcface.bk,.bigcard.r-dorada .bcface.bk{
-  background:linear-gradient(160deg,#f6dd99,#c89b4a 30%,#fbeec4 52%,#b98a35 75%,#f0d68e)}
+  background:linear-gradient(160deg,#f3ead6,#d4bd8a 30%,#faf4e6 52%,#c4a96f 75%,#efe5cd)}
+.bigcard.r-rara .bcface.bk{background:linear-gradient(160deg,#e3f0e8,#b9c8d6 28%,#efe8f6 50%,#a9bfb4 72%,#dcd2ea)}
+.bigcard.r-epica .bcface.bk{background:linear-gradient(160deg,#7a52b0,#caa64a 22%,#46286f 45%,#e3c878 62%,#33205c 85%,#8a5fc4)}
+.bigcard.r-dorada .bcface.bk{background:linear-gradient(160deg,#f6dd99,#c89b4a 30%,#fbeec4 52%,#b98a35 75%,#f0d68e)}
 .bc-in{position:relative;width:100%;height:100%;border-radius:13px;overflow:hidden;display:flex;flex-direction:column;
-  background:linear-gradient(170deg,#2b1e56,#140d31)}
-.bigcard.r-dorada .bc-in{background:linear-gradient(170deg,#3a2c12,#171026)}
+  background:linear-gradient(170deg,#f6f1e4,#e9dfc8)}
+.bigcard.r-rara .bc-in{background:linear-gradient(170deg,#f2f6f0,#e0e8e4)}
+.bigcard.r-epica .bc-in{background:linear-gradient(170deg,#f1ecf6,#dcd1e8)}
+.bigcard.r-dorada .bc-in{background:linear-gradient(170deg,#fbf4dd,#f1e3b8)}
 .bc-art{flex:1;display:flex;align-items:center;justify-content:center;position:relative;
-  background:radial-gradient(circle at 50% 38%,rgba(91,63,174,.55),transparent 70%)}
-.bigcard.r-rara .bc-art{background:radial-gradient(circle at 50% 38%,rgba(215,106,152,.4),transparent 70%)}
-.bigcard.r-epica .bc-art,.bigcard.r-dorada .bc-art{background:radial-gradient(circle at 50% 38%,rgba(227,184,95,.35),transparent 70%)}
-.bc-art .glyph{font-size:84px;filter:drop-shadow(0 10px 24px rgba(0,0,0,.5))}
-.bc-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  background:radial-gradient(circle at 50% 40%,rgba(227,184,95,.28),transparent 70%)}
+.bigcard.r-rara .bc-art{background:radial-gradient(circle at 50% 40%,rgba(150,200,175,.32),transparent 70%)}
+.bigcard.r-epica .bc-art{background:radial-gradient(circle at 50% 40%,rgba(150,100,200,.3),transparent 70%)}
+.bigcard.r-dorada .bc-art{background:radial-gradient(circle at 50% 40%,rgba(227,184,95,.45),transparent 70%)}
+.bc-art .glyph{font-size:84px;filter:drop-shadow(0 8px 18px rgba(60,40,20,.35))}
+/* PNG completo de la carta (marco+arte): cubre todo el interior */
+.bc-full{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5}
 .bc-no{position:absolute;top:9px;left:9px;width:34px;height:34px;border-radius:50%;z-index:2;
   background:var(--ivory);border:2px solid rgba(29,42,74,.35);color:var(--navy);
   font-family:'Cormorant Garamond';font-weight:700;font-size:19px;display:flex;align-items:center;justify-content:center;
   box-shadow:0 3px 9px rgba(0,0,0,.35)}
-.bc-star{position:absolute;top:10px;right:11px;font-size:21px;z-index:2;
-  filter:drop-shadow(0 2px 5px rgba(0,0,0,.45))}
+/* sello circular de rareza (como el impreso: COMÚN ★ / ESPECIAL ★★ …) */
+.bc-rar{position:absolute;top:9px;right:9px;min-width:46px;height:46px;border-radius:50%;z-index:2;padding:0 5px;
+  background:var(--ivory);border:2px solid rgba(29,42,74,.3);box-shadow:0 3px 9px rgba(0,0,0,.3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.bc-rar b{font-size:6.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--navy);line-height:1}
+.bc-rar span{font-size:8.5px;letter-spacing:1.5px;color:#41597a;line-height:1}
+.bigcard.r-epica .bc-rar{background:#3a2566;border-color:rgba(227,184,95,.6)}
+.bigcard.r-epica .bc-rar b{color:var(--gold-1)}
+.bigcard.r-epica .bc-rar span{color:var(--gold-2)}
+.bigcard.r-dorada .bc-rar b,.bigcard.r-dorada .bc-rar span{color:#8a6a1f}
 .bc-plate{margin:0 9px 10px;background:linear-gradient(180deg,#faf7ee,#e8e2d2);border-radius:11px;
   padding:9px 8px 8px;text-align:center;box-shadow:inset 0 1px 0 #fff,0 3px 10px rgba(0,0,0,.3);position:relative;z-index:2}
 .bc-plate .nm{font-family:'Cormorant Garamond';font-weight:700;font-size:20px;line-height:1;color:var(--navy);

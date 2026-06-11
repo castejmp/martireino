@@ -49,7 +49,7 @@ const logoHTML = `
 const CODE_RE = /^[a-z0-9]{4,8}$/i;
 const RESERVED = new Set(["app", "css", "js", "assets", "docs", "demo"]);
 const LS_CODE = "martixv:code";
-const saveKey = c => "martixv:save2:" + c;
+const saveKey = c => "martixv:save3:" + c;
 
 function validCode(c) {
   return !!c && CODE_RE.test(c) && !RESERVED.has(c.toLowerCase()) && !/\./.test(c);
@@ -70,7 +70,7 @@ function freshState() {
   return {
     screen: "gate", tab: "album",
     code: null, name: "", avatar: null, selfie: null, entered: false,
-    counts: {}, golds: [false, false, false, false, false],
+    counts: {}, golds: GOLD.map(() => false),
     sources: { start: true, ig: true },
     lastSync: null,
     cartasFound: 0, usedCodes: [],
@@ -402,7 +402,7 @@ function figCard(f) {
   if (!q) return `<div class="fig empty"><span class="no">${no}</span>
     <span class="q">?</span><div class="fm" style="margin-top:6px">${esc(f.fm)}</div></div>`;
   return `<div class="fig have r-${f.r}"><span class="no">${no}</span>
-    <span class="st" style="color:${RARITY_STAR[f.r]}">★</span>
+    <span class="st" style="color:${RARITY_STAR[f.r]}">${"★".repeat(RARITY_STARS[f.r])}</span>
     ${f.img ? `<img class="art" src="${f.img}" alt="" onerror="this.remove()">` : ""}
     <span class="glyph">${f.g}</span><div class="fn">${esc(f.nm)}</div><div class="fm">${esc(f.fm)}</div>
     ${q > 1 ? `<span class="dq">x${q}</span>` : ""}</div>`;
@@ -449,6 +449,7 @@ function renderAlbum() {
     <div class="sh"><span>Doradas · pura suerte</span><div class="ln"></div></div>
     <div class="goldrow">
       ${GOLD.map((g, i) => `<div class="gcard ${S.golds[i] ? "won" : "locked"}">
+        <span class="no">${16 + i}</span>
         <span class="lk">${S.golds[i] ? "✨" : "🔒"}</span><span class="glyph">${g.g}</span>
         <div class="fn">${g.nm}</div></div>`).join("")}
     </div>
@@ -513,33 +514,27 @@ function openPack(srcKey, count) {
   });
 }
 
+/* Carta grande. Si `img` existe es el PNG completo de la carta
+   (marco + número + nombre + arte) y cubre todo; si no, se
+   dibuja el marco en CSS imitando el diseño impreso. */
 function bigCardHTML(c) {
-  if (c.kind === "gold") {
-    const g = GOLD[c.idx];
-    return `
-      <div class="bigcard r-dorada" id="bc">
-        <div class="tagwrap"><span class="tag dor">¡Dorada!</span></div>
-        <div class="in">
-          <div class="bcface fr"><img class="mfr" src="assets/logo-m.png" alt=""></div>
-          <div class="bcface bk"><div class="bc-in">
-            <div class="bc-star">✨</div>
-            <div class="bc-art"><span class="glyph">${g.g}</span></div>
-            <div class="bc-plate"><div class="nm">${g.nm}</div><div class="fm">Dorada del Reino</div></div>
-          </div></div>
-        </div>
-      </div>`;
-  }
-  const f = c.f;
+  const isGold = c.kind === "gold";
+  const f = isGold ? GOLD[c.idx] : c.f;
+  const r = isGold ? "dorada" : f.r;
+  const no = isGold ? 16 + c.idx : f.id;
+  const tag = isGold ? `<span class="tag dor">¡Dorada!</span>`
+    : `<span class="tag ${c.nu ? "new" : "rep"}">${c.nu ? "¡Nueva!" : "Repetida"}</span>`;
   return `
-    <div class="bigcard r-${f.r}" id="bc">
-      <div class="tagwrap"><span class="tag ${c.nu ? "new" : "rep"}">${c.nu ? "¡Nueva!" : "Repetida"}</span></div>
+    <div class="bigcard r-${r}" id="bc">
+      <div class="tagwrap">${tag}</div>
       <div class="in">
         <div class="bcface fr"><img class="mfr" src="assets/logo-m.png" alt=""></div>
         <div class="bcface bk"><div class="bc-in">
-          <div class="bc-no">${f.id}</div>
-          <div class="bc-star" style="color:${RARITY_STAR[f.r]}">★</div>
-          <div class="bc-art">${f.img ? `<img src="${f.img}" alt="" onerror="this.remove()">` : ""}<span class="glyph">${f.g}</span></div>
-          <div class="bc-plate"><div class="nm">${esc(f.nm)}</div><div class="fm">${esc(f.fm)} · ${RARITY_LABEL[f.r]}</div></div>
+          <div class="bc-no">${no}</div>
+          <div class="bc-rar"><b>${RARITY_LABEL[r]}</b><span>${"★".repeat(RARITY_STARS[r])}</span></div>
+          <div class="bc-art"><span class="glyph">${f.g}</span></div>
+          <div class="bc-plate"><div class="nm">${esc(f.nm)}</div><div class="fm">✦ Colección de Aventuras ✦</div></div>
+          ${f.img ? `<img class="bc-full" src="${f.img}" alt="" onerror="this.remove()">` : ""}
         </div></div>
       </div>
     </div>`;

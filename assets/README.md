@@ -10,14 +10,15 @@ Carpeta para el arte real del juego. La app funciona sin estos archivos
   en el dorso de las cartas del reveal.
 - **`logo-m.svg`** — la misma "M" en vector; variante sólida usada como
   sello de lacre del sobre (inline desde `js/app.js`).
-- **`figus/`** — ilustraciones de las cartas (formato vertical ~3:4.2,
-  como la figu impresa). Para activar una: poner el archivo acá
-  (ej. `figus/01.jpg`) y setear la ruta en `js/data.js`:
+- **`figus/`** — cartas completas (marco + número + nombre + arte) en
+  vertical ~3:4, una por figu: `01.png` … `15.png` y las doradas
+  `16.png`, `17.png`, `18.png`. Para activar una: poner el archivo acá
+  y setear `img` en `js/data.js`:
 
   ```js
-  { id: 1, g: "🐚", nm: "Marti Sirena", fm: "La Sirenita", r: "comun", img: "assets/figus/01.jpg" },
+  { id: 1, g: "🐚", nm: "Marti Sirena", ..., img: "assets/figus/01.png" },
   ```
 
-  Si la imagen falta o falla, la carta muestra el emoji como fallback.
-  Comprimir a <100 KB por imagen: en la fiesta van a cargar 100 celus
+  La carta PNG cubre todo (el marco CSS queda de fallback si falla).
+  Comprimir a <150 KB por imagen: en la fiesta van a cargar 200 celus
   con el wifi del salón.

@@ -39,8 +39,8 @@ docs/ANALISIS.md  análisis técnico para el evento real
 
 ## Juego (pensado 100% desde el celu)
 
-- **Álbum**: 15 figus (comunes/raras/épicas) + 5 doradas de pura suerte
-  (cada dorada gana un colgante RGB).
+- **Álbum**: 15 figus (Común ★ / Especial ★★ / Legendaria ★★★) + 3
+  doradas de pura suerte (cada dorada gana un colgante RGB).
 - **Sobres**: bienvenida (6 figus), seguir a Instagram @andro.show (+1),
   canje de códigos de entrevistas (+1/+3/+5/+10) y sobres físicos
   escondidos por el salón (+2 c/u, máx. 3). Reveal **de a una carta**

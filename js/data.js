@@ -58,13 +58,14 @@ const SRC = {
 };
 const CARTAS_MAX = 3; /* sobres físicos escondidos canjeables por persona */
 
-/* Premios. Los principales desaparecen de la lista al entregarse;
-   los 10 colgantes RGB bajan a medida que salen (5 van seguro con
-   las cartas doradas). */
+/* Premios principales: se entregan por orden de álbum completo
+   (1º, 2º y 3º). Al entregarse quedan en gris con su ganador.
+   Los 10 colgantes RGB bajan a medida que salen (las 5 cartas
+   doradas se llevan uno seguro). */
 const PRIZES_MAIN = [
-  { key: "camara",  g: "📷", nm: "Cámara instantánea", how: "Primer álbum completo de la noche" },
-  { key: "reloj",   g: "🕛", nm: "Reloj Disney",       how: "Sorteo entre los álbumes completos" },
-  { key: "peluche", g: "🧸", nm: "Peluche Disney",     how: "Ganador de la trivia" },
+  { key: "camara",  g: "📷", nm: "Cámara de fotos", how: "1º en completar el álbum" },
+  { key: "reloj",   g: "🕛", nm: "Reloj Disney",    how: "2º en completar el álbum" },
+  { key: "peluche", g: "🧸", nm: "Peluche Disney",  how: "3º en completar el álbum" },
 ];
 const SEC_TOTAL = 10; /* colgantes RGB Marti Disney */
 

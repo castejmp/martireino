@@ -37,18 +37,24 @@ docs/ANALISIS.md  análisis técnico para el evento real
    `localStorage` — recargar, bloquear el celu o re-escanear el QR retoma
    el álbum donde estaba.
 
-## Juego
+## Juego (pensado 100% desde el celu)
 
-- **Álbum**: 15 figus (comunes/raras/épicas) + 3 doradas de pura suerte.
-- **Sobres**: bienvenida, código sorpresa por micrófono, trivia Disney y
-  carta escondida. Reveal **de a una carta** con flip, brillo por rareza y
+- **Álbum**: 15 figus (comunes/raras/épicas) + 5 doradas de pura suerte
+  (cada dorada gana un colgante RGB).
+- **Sobres**: bienvenida (6 figus), seguir a Instagram @andro.show (+1),
+  canje de códigos de entrevistas (+1/+3/+5/+10), sobres físicos
+  escondidos por el salón (+2 c/u, máx. 3) y trivia como extra si hay
+  pantalla. Reveal **de a una carta** con flip, brillo por rareza y
   confetti. Pity rule: un sobre nunca es todo repetidas al arrancar.
 - Las **épicas casi no salen en sobres**: el muro que obliga a cambiar.
 - **Cambiar**: pedidos al salón ("se busca"), ofertas, y canje cara a cara
   con código de 4 dígitos.
-- **El Reino**: feed en vivo de la fiesta.
-- **Premios**: primera dorada → Reloj Disney; primer álbum completo →
-  cámara de fotos + carta dorada en el Mercadito del Reino.
+- **Premios** (pestaña dorada): 3 principales (cámara instantánea, reloj
+  Disney, peluche) + 10 colgantes RGB que desaparecen al entregarse.
+- **El Reino**: feed en vivo de la fiesta. **Cuenta**: perfil, stats,
+  código de canje y opciones.
+- **Sobre regalo**: el backend puede lanzar "recibís un sobre en 3:00" —
+  aparece un contador sobre la barra y al llegar a cero se abre.
 
 > Todo lo multiplayer (feed, canjes, sorteos) está **simulado client-side**:
 > es la maqueta para validar UX antes del backend. Qué hace falta para la

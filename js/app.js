@@ -49,7 +49,7 @@ const logoHTML = `
 const CODE_RE = /^[a-z0-9]{4,8}$/i;
 const RESERVED = new Set(["app", "css", "js", "assets", "docs", "demo"]);
 const LS_CODE = "martixv:code";
-const saveKey = c => "martixv:save:" + c;
+const saveKey = c => "martixv:save2:" + c;
 
 function validCode(c) {
   return !!c && CODE_RE.test(c) && !RESERVED.has(c.toLowerCase()) && !/\./.test(c);
@@ -69,12 +69,15 @@ let S, reqTimer = null;
 function freshState() {
   return {
     screen: "gate", tab: "album",
-    code: null, name: "", avatar: null, selfie: null,
-    counts: {}, golds: [false, false, false],
-    sources: { start: true, codigo: true, trivia: true, carta: true },
+    code: null, name: "", avatar: null, selfie: null, entered: false,
+    counts: {}, golds: [false, false, false, false, false],
+    sources: { start: true, ig: true, trivia: true },
+    cartasFound: 0, usedCodes: [],
+    gift: null, colgantes: 0, secLeft: SEC_TOTAL,
+    prizes: { camara: false, reloj: false, peluche: false },
     myReq: null,
     salon: [], feed: [], unread: 0,
-    relojWon: false, done: false,
+    done: false,
     myCode: String(Math.floor(1000 + Math.random() * 9000)),
   };
 }
@@ -144,6 +147,11 @@ function paintDot() {
 function ambient() {
   const r = Math.random(), A = rnd(GUESTS); let B = rnd(GUESTS); while (B === A) B = rnd(GUESTS);
   const f = rnd(FIGS);
+  if (r < .07 && S.secLeft > 0) {
+    S.secLeft--; save();
+    if (S.tab === "prizes" && S.screen === "app") renderTab();
+    return feedPush(`<b>${A}</b> sacó una dorada ✨ y se llevó un colgante RGB`, "📿");
+  }
   if (r < .3) return feedPush(`<b>${A}</b> y <b>${B}</b> cambiaron figus`, "🔄");
   if (r < .55) return feedPush(`<b>${A}</b> abrió un sobre y encontró a <span class="g">${f.nm} ${f.g}</span>`, "🎁");
   if (r < .72) return feedPush(`<b>${A}</b> le pasó <span class="g">${f.nm}</span> a <b>${B}</b> — ¡genia!`, "🤝");
@@ -162,6 +170,7 @@ function seedSalon() { S.salon = [newSalonReq(), newSalonReq(), newSalonReq()]; 
 
 /* ---------------- router ---------------- */
 function render() {
+  if (typeof updateGiftBar === "function") updateGiftBar();
   if (S.screen !== "app") {
     hdr.classList.remove("on"); nav.classList.remove("on");
     view.className = "pad intro";
@@ -204,6 +213,8 @@ function renderTab() {
   syncNav();
   if (S.tab === "album") return renderAlbum();
   if (S.tab === "trade") return renderTrade();
+  if (S.tab === "prizes") return renderPrizes();
+  if (S.tab === "account") return renderAccount();
   return renderFeed();
 }
 
@@ -279,8 +290,8 @@ function renderOnboarding() {
         <div class="d">Aparece en tu carta dorada si completás el Reino</div></div>
       </div>
       <input type="file" id="selfieIn" accept="image/*" capture="user" hidden>
-      <p class="hint center mt12">— o elegí un personaje —</p>
-      <div class="avgrid" id="avs">
+      <p class="hint center mt12 ${S.selfie ? "dim" : ""}">— o elegí un personaje —</p>
+      <div class="avgrid ${S.selfie ? "dim" : ""}" id="avs">
         ${AVATARS.map((a, i) => `<div class="av ${!S.selfie && S.avatar && S.avatar.n === a.n ? "sel" : ""}" data-i="${i}">${a.g}<small>${a.n}</small></div>`).join("")}
       </div>
     </div>
@@ -300,9 +311,13 @@ function renderOnboarding() {
     if (!S.name) return toast("Poné tu nombre 🙂");
     if (!S.avatar && !S.selfie) return toast("Elegí un personaje o sacate una selfie ✨");
     S.screen = "app"; S.tab = "album";
-    seedSalon(); startAmbient(); save(); render();
-    feedPush(`<b>Vos</b> entraste al Reino ✦ ¡bienvenida!`, "🏰", true);
-    if (S.sources.start) setTimeout(() => openPack("start"), 420);
+    if (!S.salon.length) seedSalon();
+    startAmbient(); save(); render();
+    if (!S.entered) {
+      S.entered = true; save();
+      feedPush(`<b>Vos</b> entraste al Reino ✦ ¡bienvenida!`, "🏰", true);
+      if (S.sources.start) setTimeout(() => openPack("start"), 420);
+    }
   });
 }
 
@@ -340,30 +355,41 @@ function figCard(f) {
     <span class="glyph">${f.g}</span><div class="fn">${esc(f.nm)}</div><div class="fm">${esc(f.fm)}</div>
     ${q > 1 ? `<span class="dq">x${q}</span>` : ""}</div>`;
 }
+function srcAvailable(k) {
+  if (k === "codigo" || k === "gift") return true;
+  if (k === "carta") return S.cartasFound < CARTAS_MAX;
+  return !!S.sources[k];
+}
 function renderAlbum() {
-  const u = uniques(), left = Object.keys(S.sources).filter(k => S.sources[k]);
+  const u = uniques();
   let act = "";
   if (S.done) {
     act = `<div class="wall center mt8"><div class="pill">👑 Reino completo</div>
       <p class="hint mt12">Ya tenés tu carta dorada esperándote en el Mercadito.</p></div>`;
-  } else if (left.length) {
+  } else {
+    const order = ["start", "ig", "codigo", "carta", "trivia"];
+    const onceDone = !S.sources.start && !S.sources.ig && S.cartasFound >= CARTAS_MAX;
     act = `
       <div class="sh"><span>Conseguir sobres</span><div class="ln"></div></div>
-      <p class="hint" style="margin-bottom:11px">Los sobres son contados — caen solo en momentos de la noche.
-      <em>En la fiesta los dispara la pantalla grande; acá simulalos tocando.</em></p>
+      <p class="hint" style="margin-bottom:11px">Deberás <b style="color:var(--ink)">encontrar los sobres</b> escondidos,
+      <b style="color:var(--ink)">canjear códigos</b> de las entrevistas o
+      <b style="color:var(--rose)">cambiar las repetidas</b> por las que te faltan.</p>
       <div class="srcs">
-        ${Object.keys(SRC).map(k => `<div class="src ${S.sources[k] ? "" : "spent"}" data-src="${k}">
-          <div class="ic">${SRC[k].ic}</div><div class="t">${SRC[k].t}</div><div class="d">${SRC[k].d}</div></div>`).join("")}
-      </div>`;
-  } else {
-    act = `
-      <div class="sh"><span>Te faltan ${15 - u}</span><div class="ln"></div></div>
-      <div class="wall">
-        <div class="pill">🔒 No salen más en sobres</div>
-        <p class="hint mt12">Abriste todos tus sobres. Las que faltan son las más raras del Reino —
-        la única forma de cerrarlo es <b style="color:var(--rose)">cambiando con alguien</b>.</p>
+        ${order.map(k => {
+          const m = SRC[k], on = srcAvailable(k);
+          const extra = k === "carta" && on && S.cartasFound > 0
+            ? `<div class="d" style="color:var(--green);font-weight:800">${S.cartasFound}/${CARTAS_MAX} encontrados</div>` : "";
+          return `<div class="src ${on ? "" : "spent"}" data-src="${k}">
+            <div class="ic">${m.ic}</div><div class="t">${m.t}</div><div class="d">${m.d}</div>${extra}</div>`;
+        }).join("")}
+      </div>
+      ${onceDone && u < 15 ? `
+      <div class="wall mt12">
+        <div class="pill">🔒 Te faltan ${15 - u}</div>
+        <p class="hint mt12">Las que faltan son las más raras del Reino — cerralo
+        <b style="color:var(--rose)">cambiando con alguien</b> o canjeando más códigos.</p>
         <button class="btn rose mt16" id="goTrade">Ir a cambiar</button>
-      </div>`;
+      </div>` : ""}`;
   }
   view.innerHTML = `
     <div class="grid">${FIGS.map(figCard).join("")}</div>
@@ -374,7 +400,7 @@ function renderAlbum() {
         <span class="lk">${S.golds[i] ? "✨" : "🔒"}</span><span class="glyph">${g.g}</span>
         <div class="fn">${g.nm}</div></div>`).join("")}
     </div>
-    <p class="footnote">No hacen falta para ganar · la primera dorada de la noche se lleva el Reloj Disney 🕛</p>`;
+    <p class="footnote">No hacen falta para ganar · cada dorada se lleva un colgante RGB de Marti 📿</p>`;
   view.querySelectorAll(".src").forEach(el => el.addEventListener("click", () => routeSource(el.dataset.src)));
   const g = $("#goTrade"); if (g) g.addEventListener("click", () => { S.tab = "trade"; renderTab(); });
 }
@@ -382,9 +408,10 @@ function renderAlbum() {
 /* ---------------- fuentes de sobres ---------------- */
 function routeSource(k) {
   if (k === "start") return openPack("start");
-  if (k === "codigo") return codigoFlow();
-  if (k === "trivia") return triviaFlow();
+  if (k === "ig") return igFlow();
+  if (k === "codigo") return codeRedeemFlow();
   if (k === "carta") return cartaFlow();
+  if (k === "trivia") return triviaFlow();
 }
 function showSheet(html) { sheet.innerHTML = html; sheet.classList.add("on"); }
 function hideSheet() {
@@ -395,23 +422,30 @@ function hideSheet() {
 /* ---------------- sobre + reveal de a una ---------------- */
 let RV = null;
 
-function openPack(srcKey) {
-  if (!S.sources[srcKey]) return;
+function openPack(srcKey, count) {
+  if (!srcAvailable(srcKey)) return;
   const meta = SRC[srcKey];
+  const n = count || meta.n;
+  const kick = srcKey === "start" ? "Tu sobre de bienvenida"
+    : srcKey === "gift" ? "¡Regalo del Reino!" : "¡Un sobre más!";
   showSheet(`
-    <div class="kicker">${srcKey === "start" ? "Tu sobre de bienvenida" : "¡Un sobre más!"}</div>
+    <div class="kicker">${kick}</div>
     <div class="env" id="env"><div class="flapline"></div><div class="seal">${mSVG({ solid: "#2a1c08", cls: "ms" })}</div></div>
-    <p class="lead" style="max-width:250px">Tocá el sello para abrirlo</p>`);
+    <p class="lead" style="max-width:250px">Tocá el sello para abrirlo</p>
+    <p class="hint mt8">${n} figu${n > 1 ? "s" : ""} adentro</p>`);
   const env = $("#env");
   env.addEventListener("click", function once() {
     env.removeEventListener("click", once);
     env.classList.add("opening");
     vibrate([14, 60, 24]);
 
-    const minNew = srcKey === "start" ? 3 : (uniques() < 10 ? 1 : 0);
-    const draws = applyPity(Array.from({ length: meta.n }, () => drawOne()), minNew);
+    if (srcKey === "carta") S.cartasFound++;
+    else if (meta.once) S.sources[srcKey] = false;
+
+    const minNew = Math.min(n, srcKey === "start" ? 3 : (uniques() < 10 ? 1 : 0));
+    const draws = applyPity(Array.from({ length: n }, () => drawOne()), minNew);
     let dorIdx = -1;
-    if (GOLD.some((_, i) => !S.golds[i]) && Math.random() < meta.dor) {
+    if (meta.dor && GOLD.some((_, i) => !S.golds[i]) && Math.random() < meta.dor) {
       const locked = GOLD.map((_, i) => i).filter(i => !S.golds[i]);
       dorIdx = rnd(locked); S.golds[dorIdx] = true;
     }
@@ -420,7 +454,7 @@ function openPack(srcKey) {
       return { kind: "fig", f: fig(id), nu: before === 0 };
     });
     if (dorIdx >= 0) queue.push({ kind: "gold", idx: dorIdx });
-    S.sources[srcKey] = false; save();
+    save();
     const nNew = queue.filter(c => c.nu).length;
     feedPush(`<b>Vos</b> abriste un sobre — <span class="g">${nNew} nuevas</span>, ${draws.length - nNew} repetidas`, "🎁", true);
 
@@ -529,27 +563,52 @@ function afterGain() {
   if (!left && uniques() < 15) toast("Te quedan huecos… ¡toca cambiar! 🔄");
 }
 
-/* ---- código sorpresa ---- */
-function codigoFlow() {
-  const w = rnd(CODEWORDS);
+/* ---- canjear código (+1 / +3 / +5 / +10) ----
+   Los códigos se reparten en entrevistas, sobres físicos y momentos
+   de la noche. En producción los valida el backend contra la lista
+   emitida; en la demo el sufijo numérico define cuántas figus trae. */
+function codeRedeemFlow() {
   showSheet(`
     <div class="mcard">
-      <div class="kicker center">📣 Código sorpresa</div>
-      <p class="hint center mt8">Marti dice por micrófono:</p>
-      <div class="codebig" style="font-size:46px;letter-spacing:.14em;margin:8px 0 4px">${w}</div>
-      <p class="hint center" style="margin-bottom:14px">Tipealo antes de que se cierre</p>
-      <input class="field" id="cw" placeholder="Escribí la palabra" autocomplete="off" style="text-align:center;text-transform:uppercase">
-      <button class="btn mt12" id="okc">Enviar</button>
+      <div class="kicker center">🎤 Canjear código</div>
+      <p class="hint center mt8">Conseguí códigos en las <b style="color:var(--gold-1)">entrevistas</b> y
+      sorpresas de la noche. Valen <b style="color:var(--gold-1)">+1, +3, +5 o +10</b> figus.</p>
+      <input class="field mt12" id="cw" placeholder="Ej: ANDRO5" autocomplete="off" maxlength="12"
+        style="text-align:center;text-transform:uppercase;letter-spacing:.12em">
+      <button class="btn mt12" id="okc">Canjear</button>
       <button class="btn ghost mt8" id="noc">Cerrar</button>
+      <p class="hint center mt8" style="opacity:.65">Demo: probá ANDRO1, MARTI3, SHOW5 o REINO10</p>
     </div>`);
   $("#noc").addEventListener("click", hideSheet);
+  const bad = msg => {
+    const i = $("#cw"); if (!i) return;
+    i.classList.add("bad"); toast(msg); vibrate(60);
+    setTimeout(() => i.classList.remove("bad"), 450);
+  };
   $("#okc").addEventListener("click", () => {
-    if ($("#cw").value.trim().toUpperCase() === w) { hideSheet(); setTimeout(() => openPack("codigo"), 200); }
-    else {
-      $("#cw").classList.add("bad"); toast("Esa no era 🙈"); vibrate(60);
-      setTimeout(() => $("#cw") && $("#cw").classList.remove("bad"), 450);
-    }
+    const v = $("#cw").value.trim().toUpperCase();
+    const m = v.match(/^[A-Z]{3,10}(10|[135])$/);
+    if (!m) return bad("Ese código no existe 🙈");
+    if (S.usedCodes.includes(v)) return bad("Ese código ya lo usaste 😉");
+    S.usedCodes.push(v); save();
+    hideSheet(); setTimeout(() => openPack("codigo", +m[1]), 200);
   });
+}
+
+/* ---- seguinos en instagram ---- */
+function igFlow() {
+  showSheet(`
+    <div class="mcard center">
+      <div class="kicker">📸 Seguinos en Instagram</div>
+      <div class="codebig mt8" style="font-size:28px;letter-spacing:.04em">@andro.show</div>
+      <p class="hint mt8">Seguinos y llevate una figu de regalo.</p>
+      <a class="btn mt12" style="display:block;text-decoration:none"
+        href="https://instagram.com/andro.show" target="_blank" rel="noopener">Abrir Instagram</a>
+      <button class="btn rose mt8" id="igOk">¡Ya los sigo! ✓</button>
+      <button class="btn ghost mt8" id="igNo">Ahora no</button>
+    </div>`);
+  $("#igNo").addEventListener("click", hideSheet);
+  $("#igOk").addEventListener("click", () => openPack("ig"));
 }
 
 /* ---- trivia ---- */
@@ -557,7 +616,7 @@ function triviaFlow() {
   const t = rnd(TRIVIA), K = ["A", "B", "C", "D"], dur = 8000, C = 226;
   showSheet(`
     <div class="mcard">
-      <div class="kicker center">💡 Trivia Disney</div>
+      <div class="kicker center">🎬 Trivia en pantalla · extra</div>
       <h2 class="center" style="font-family:'Cormorant Garamond';font-weight:700;font-size:24px;line-height:1.1;margin:12px 0 0;color:#fff">${t.q}</h2>
       <div class="opts" id="opts">${t.o.map((o, i) => `<div class="opt" data-i="${i}"><span class="k">${K[i]}</span>${o}</div>`).join("")}</div>
       <div class="ringt"><svg width="74" height="74"><circle cx="37" cy="37" r="32" stroke="rgba(255,255,255,.1)" stroke-width="6" fill="none"/>
@@ -590,7 +649,8 @@ function triviaFlow() {
       <p class="lead mt12">¡Correcta! Sorteando entre los que acertaron…</p>
       <div class="codebig mt12" style="letter-spacing:.04em">✦ ✦ ✦</div></div>`);
     setTimeout(() => {
-      feedPush(`<b>Vos</b> ganaste la ronda de trivia 💡`, "🏆", true);
+      S.prizes.peluche = true; save();
+      feedPush(`<b>Vos</b> ganaste la ronda de trivia 💡 — ¡peluche Disney!`, "🏆", true);
       showSheet(`<div class="mcard center"><div class="kicker">🎉 ¡Saliste sorteada!</div>
         <p class="lead mt12">Te llevás un <b style="color:var(--rose)">peluche Disney 🧸</b><br>y un sobre extra.</p>
         <button class="btn mt16" id="op">Abrir mi sobre</button></div>`);
@@ -599,23 +659,27 @@ function triviaFlow() {
   }
 }
 
-/* ---- carta escondida ---- */
+/* ---- sobres escondidos por el salón ---- */
 function cartaFlow() {
   showSheet(`
     <div class="mcard center">
-      <div class="kicker">🃏 Carta escondida</div>
-      <p class="lead mt12">La encontraste atrás del centro de mesa…<br>¡tiene chip y todo!</p>
-      <button class="btn mt16" id="okk">Chocarla con el celu</button>
-      <button class="btn ghost mt8" id="nok">Dejarla donde estaba</button>
+      <div class="kicker">🃏 Sobres escondidos</div>
+      <p class="lead mt12">Hay sobres físicos escondidos por todo el salón.<br>
+      Cada uno trae un código adentro.</p>
+      <p class="hint mt8">Encontraste ${S.cartasFound} de ${CARTAS_MAX} posibles</p>
+      <button class="btn mt16" id="okk">¡Encontré uno! Canjearlo</button>
+      <button class="btn ghost mt8" id="nok">Sigo buscando</button>
     </div>`);
   $("#nok").addEventListener("click", hideSheet);
   $("#okk").addEventListener("click", () => openPack("carta"));
 }
 
-/* ---- dorada: premio ---- */
+/* ---- dorada: cada una se lleva un colgante RGB ---- */
 function doradaOverlay(idx) {
-  const first = !S.relojWon; if (first) { S.relojWon = true; save(); }
-  feedPush(`<span class="r">¡Vos sacaste una dorada!</span> ${GOLD[idx].nm} ${GOLD[idx].g}`, "✨", true);
+  S.colgantes++;
+  if (S.secLeft > 0) S.secLeft--;
+  save();
+  feedPush(`<span class="r">¡Vos sacaste una dorada!</span> ${GOLD[idx].nm} ${GOLD[idx].g} — colgante RGB 📿`, "✨", true);
   showSheet(`
     <div class="rays"></div>
     <div style="position:relative;z-index:2" class="center">
@@ -625,7 +689,8 @@ function doradaOverlay(idx) {
         <div class="nm">${GOLD[idx].nm}</div>
         <div class="sub">Dorada del Reino</div>
       </div>
-      ${first ? `<div class="pill mt16" style="font-size:13px;padding:10px 18px">🕛 Primera dorada de la noche — ¡ganás el Reloj Disney!</div>` : ""}
+      <div class="pill mt16" style="font-size:13px;padding:10px 18px">📿 ¡Te llevás un colgante RGB de Marti!</div>
+      <p class="hint mt8">Retiralo en el Mercadito del Reino</p>
       <button class="btn mt20" id="dk" style="max-width:220px">¡Vamos!</button>
     </div>`);
   $("#dk").addEventListener("click", () => { hideSheet(); render(); afterGain(); });
@@ -642,7 +707,7 @@ function renderTrade() {
   const myReqHtml = S.myReq
     ? `<div class="req mreq"><div class="fg">${fig(S.myReq).g}</div>
         <div class="tx"><div class="a">Estás buscando <b>${esc(fig(S.myReq).nm)}</b></div>
-        <div class="b">Tu pedido se ve en la pantalla grande</div></div>
+        <div class="b">Todo el Reino ve tu pedido</div></div>
         <button class="btn ghost sm" id="cancelReq">✕</button></div>`
     : `<button class="btn rose mt8" id="pubReq">🙋 Pedir una figu</button>`;
 
@@ -695,7 +760,7 @@ function pickRequest() {
   sheet.querySelectorAll(".opt").forEach(el => el.addEventListener("click", () => {
     S.myReq = +el.dataset.id; save(); hideSheet(); renderTrade();
     feedPush(`<b>Vos</b> publicaste: busco <span class="g">${esc(fig(S.myReq).nm)} ${fig(S.myReq).g}</span>`, "🙋", true);
-    toast("Tu pedido salió a la pantalla 🙋");
+    toast("Tu pedido salió al Reino 🙋");
     scheduleReqOffer(6200);
   }));
 }
@@ -797,9 +862,112 @@ function renderFeed() {
       || `<p class="hint">Todavía no pasó nada… abrí tu sobre 🎁</p>`}</div>`;
 }
 
+/* ---------------- premios ---------------- */
+function renderPrizes() {
+  const main = PRIZES_MAIN.filter(p => !S.prizes[p.key]);
+  view.innerHTML = `
+    <div class="sh" style="margin-top:4px"><span>Premios principales</span><div class="ln"></div></div>
+    ${main.length ? `<div class="card">
+      ${main.map(p => `<div class="req"><div class="fg" style="font-size:24px">${p.g}</div>
+        <div class="tx"><div class="a"><b>${p.nm}</b></div><div class="b">${p.how}</div></div></div>`).join("")}
+    </div>` : `<div class="wall center"><div class="pill">🎉 Todos entregados</div>
+      <p class="hint mt12">Los premios principales ya encontraron dueño.</p></div>`}
+    <div class="sh"><span>Colgantes RGB · quedan ${S.secLeft} de ${SEC_TOTAL}</span><div class="ln"></div></div>
+    <div class="card center">
+      <div style="font-size:25px;letter-spacing:5px;line-height:1.5">${"📿".repeat(S.secLeft) || "✨ ¡Volaron todos! ✨"}</div>
+      <p class="hint mt12">${SEC_TOTAL} colgantes RGB de Marti. Las
+      <b style="color:var(--gold-1)">${GOLD.length} cartas doradas</b> se llevan uno seguro —
+      el resto se sortea durante la noche.</p>
+      ${S.colgantes ? `<div class="pill mt12">📿 Vos ya ganaste ${S.colgantes}</div>` : ""}
+    </div>
+    <p class="footnote">Los premios se retiran en el Mercadito del Reino</p>`;
+}
+
+/* ---------------- cuenta ---------------- */
+function renderAccount() {
+  const u = uniques();
+  const reps = FIGS.reduce((a, f) => a + Math.max(0, (S.counts[f.id] || 0) - 1), 0);
+  const dor = S.golds.filter(Boolean).length;
+  const stat = (n, l) => `<div class="mini" style="flex:1"><div class="g" style="font-size:24px;font-family:'Cormorant Garamond';font-weight:700;color:var(--gold-1)">${n}</div><div class="who">${l}</div></div>`;
+  view.innerHTML = `
+    <div class="card center" style="margin-top:4px">
+      <div style="width:76px;height:76px;border-radius:50%;margin:0 auto;overflow:hidden;background:rgba(227,184,95,.13);display:flex;align-items:center;justify-content:center;font-size:36px">${avatarHTML()}</div>
+      <h2 style="font-family:'Cormorant Garamond';font-weight:700;font-size:28px;margin:10px 0 6px;color:#fff">${esc(S.name)}</h2>
+      <div class="pill">Pulsera #${esc(S.code.toUpperCase())}</div>
+    </div>
+    <div class="swap" style="margin:12px 0">
+      ${stat(`${u}/15`, "figus")}${stat(reps, "repetidas")}${stat(dor, "doradas")}${stat(S.colgantes, "colgantes")}
+    </div>
+    <div class="card center">
+      <p class="hint">Tu código de canje directo</p>
+      <div class="codebig mt8">${S.myCode}</div>
+      <p class="hint" style="margin-top:2px">Dáselo a quien quiera cambiar con vos</p>
+    </div>
+    <div class="sh"><span>Opciones</span><div class="ln"></div></div>
+    <button class="btn ghost" id="editP">✏️ Cambiar nombre o foto</button>
+    <button class="btn ghost mt8" id="demoGift">🛰️ Simular sobre regalo (backend)</button>
+    <button class="btn ghost mt8" id="resetP">🔄 Reiniciar demo</button>
+    <button class="btn ghost mt8" id="outP">🚪 Salir · usar otra pulsera</button>
+    <p class="footnote">Tu pulsera es tu cuenta · el progreso queda guardado en este celu</p>`;
+  $("#editP").addEventListener("click", () => { S.screen = "onboarding"; render(); });
+  $("#demoGift").addEventListener("click", () => giftAnnounce());
+  $("#resetP").addEventListener("click", () => {
+    clearTimeout(reqTimer);
+    const code = S.code;
+    localStorage.removeItem(saveKey(code));
+    S = freshState(); S.code = code; S.screen = "onboarding";
+    updateGiftBar(); render();
+  });
+  $("#outP").addEventListener("click", () => {
+    clearTimeout(reqTimer); save();
+    localStorage.removeItem(LS_CODE);
+    S = freshState(); updateGiftBar(); render();
+  });
+}
+
+/* ---------------- sobre regalo con contador ----------------
+   En la fiesta lo dispara el backend cuando el ritmo decae:
+   "recibirás un sobre de regalo en 3 minutos". */
+const giftBar = $("#giftbar");
+function giftAnnounce(ms = 180000) {
+  if (S.gift) return toast("Ya tenés un sobre en camino 🎁");
+  showSheet(`
+    <div class="mcard center">
+      <div class="kicker">🎁 ¡Regalo del Reino!</div>
+      <p class="lead mt12">Marti te manda un sobre de regalo.<br>
+      Te llega en <b style="color:var(--gold-1)">3 minutos</b>.</p>
+      <button class="btn mt16" id="gok">¡Genial!</button>
+    </div>`);
+  $("#gok").addEventListener("click", () => {
+    S.gift = Date.now() + ms; save();
+    hideSheet(); updateGiftBar();
+    toast("Mirá el contador acá abajo 👇");
+  });
+}
+function updateGiftBar() {
+  if (!S || S.screen !== "app" || !S.gift) { giftBar.style.display = "none"; return; }
+  const left = S.gift - Date.now();
+  giftBar.style.display = "flex";
+  if (left <= 0) {
+    giftBar.classList.add("ready");
+    giftBar.textContent = "🎁 ¡Tu sobre llegó! Tocá para abrirlo";
+  } else {
+    giftBar.classList.remove("ready");
+    const m = Math.floor(left / 60000), s = Math.floor((left % 60000) / 1000);
+    giftBar.textContent = `🎁 Sobre de regalo en ${m}:${String(s).padStart(2, "0")}`;
+  }
+}
+setInterval(updateGiftBar, 1000);
+giftBar.addEventListener("click", () => {
+  if (S && S.gift && S.gift - Date.now() <= 0) {
+    S.gift = null; save(); updateGiftBar();
+    openPack("gift");
+  }
+});
+
 /* ---------------- completion ---------------- */
 function completion() {
-  S.done = true; save();
+  S.done = true; S.prizes.camara = true; save();
   feedPush(`<span class="r">¡COMPLETASTE EL REINO!</span> Las 15 figus de Marti son tuyas 👑`, "🎆", true);
   showSheet(`
     <div class="rays"></div>

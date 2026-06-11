@@ -26,7 +26,9 @@ const FIGS = [
 const GOLD = [
   { g: "👑", nm: "Marti · El Vals" },
   { g: "🤍", nm: "Marti & Papá" },
+  { g: "💖", nm: "Marti & Mamá" },
   { g: "✨", nm: "Marti Reina" },
+  { g: "🌙", nm: "Marti de Noche" },
 ];
 
 const AVATARS = [
@@ -43,17 +45,28 @@ const TRIVIA = [
   { q: "¿Cómo se llama el dragón de Mulán?", o: ["Abu", "Mushu", "Pascal", "Sven"], a: 1 },
 ];
 
-const CODEWORDS = ["FROZEN", "MOANA", "STITCH", "AURORA", "ENCANTO"];
-
-/* Fuentes de sobres. n = figus por sobre · dor = prob. de dorada.
-   En la fiesta real estos eventos los dispara la pantalla grande /
-   consola del DJ; acá se simulan con un tap. */
+/* Fuentes de sobres. n = figus por sobre · dor = prob. de dorada ·
+   once = se usa una sola vez. Pensado para jugar 100% desde el celu;
+   la pantalla grande es un extra si está disponible. */
 const SRC = {
-  start:  { ic: "🎁", t: "Sobre de bienvenida", d: "Tu único sobre al entrar",        n: 5, dor: 0.18 },
-  codigo: { ic: "📣", t: "Código sorpresa",     d: "Marti dice una palabra por mic",  n: 4, dor: 0.18 },
-  trivia: { ic: "💡", t: "Trivia Disney",       d: "Acertá y entrá al sorteo",        n: 4, dor: 0.18 },
-  carta:  { ic: "🃏", t: "Carta escondida",     d: "Buscala por el salón",            n: 4, dor: 0.35 },
+  start:  { ic: "🎁", t: "Sobre de bienvenida",  d: "Tu sobre al entrar",                   n: 6, dor: 0.12, once: true },
+  ig:     { ic: "📸", t: "Seguinos en Instagram", d: "@andro.show · +1 figu",               n: 1, dor: 0,    once: true },
+  codigo: { ic: "🎤", t: "Canjear código",        d: "Entrevistas y sorpresas · +1 a +10",  n: 1, dor: 0.15 },
+  carta:  { ic: "🃏", t: "Sobres escondidos",     d: "Buscalos por el salón · +2 c/u",      n: 2, dor: 0.2 },
+  trivia: { ic: "🎬", t: "Trivia en pantalla",    d: "Extra · si la pantalla está activa",  n: 4, dor: 0.12, once: true },
+  gift:   { ic: "🎁", t: "Sobre de regalo",       d: "Cae desde el Reino",                  n: 4, dor: 0.12 },
 };
+const CARTAS_MAX = 3; /* sobres físicos escondidos canjeables por persona */
+
+/* Premios. Los principales desaparecen de la lista al entregarse;
+   los 10 colgantes RGB bajan a medida que salen (5 van seguro con
+   las cartas doradas). */
+const PRIZES_MAIN = [
+  { key: "camara",  g: "📷", nm: "Cámara instantánea", how: "Primer álbum completo de la noche" },
+  { key: "reloj",   g: "🕛", nm: "Reloj Disney",       how: "Sorteo entre los álbumes completos" },
+  { key: "peluche", g: "🧸", nm: "Peluche Disney",     how: "Ganador de la trivia" },
+];
+const SEC_TOTAL = 10; /* colgantes RGB Marti Disney */
 
 /* Pesos de rareza para el pool de sobres.
    Épicas casi nunca: son el muro que obliga a cambiar. */

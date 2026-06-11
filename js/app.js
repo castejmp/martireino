@@ -525,11 +525,13 @@ function bigCardHTML(c) {
   const tag = isGold ? `<span class="tag dor">¡Dorada!</span>`
     : `<span class="tag ${c.nu ? "new" : "rep"}">${c.nu ? "¡Nueva!" : "Repetida"}</span>`;
   return `
-    <div class="bigcard r-${r}" id="bc">
+    <div class="bigcard framed r-${r}" id="bc">
       <div class="tagwrap">${tag}</div>
       <div class="in">
         <div class="bcface fr"><img class="mfr" src="assets/logo-m.png" alt=""></div>
         <div class="bcface bk"><div class="bc-in">
+          <img class="bc-frame" src="${RARITY_FRAME[r]}" alt=""
+            onerror="this.closest('.bigcard').classList.remove('framed');this.remove()">
           <div class="bc-no">${no}</div>
           <div class="bc-rar"><b>${RARITY_LABEL[r]}</b><span>${"★".repeat(RARITY_STARS[r])}</span></div>
           <div class="bc-art"><span class="glyph">${f.g}</span></div>

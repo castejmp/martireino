@@ -294,6 +294,29 @@ h1.title{font-family:'Cormorant Garamond';font-weight:700;line-height:.9;margin:
 .bc-art .glyph{font-size:84px;filter:drop-shadow(0 8px 18px rgba(60,40,20,.35))}
 /* PNG completo de la carta (marco+arte): cubre todo el interior */
 .bc-full{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5}
+
+/* ---------- marco real escaneado (assets/frames/*.jpg) ----------
+   El marco trae impresos el sello de rareza y "Colección de
+   Aventuras"; la app superpone solo número, nombre y arte. */
+.bc-frame{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:none}
+.framed .bc-frame{display:block}
+.bc-art{position:relative;z-index:2}
+.framed .bcface.bk{padding:0;background:#0b0820}
+.framed .bc-in{background:#0b0820;border-radius:18px}
+.framed .bc-rar{display:none}
+.framed .bc-no{left:5.6%;top:6%;width:14.5%;height:auto;aspect-ratio:1;border:0;box-shadow:none;
+  background:radial-gradient(circle,var(--fno-bg) 58%,transparent 72%);
+  color:var(--fno-fg);font-size:21px}
+.framed .bc-plate{position:absolute;left:16%;right:16%;bottom:13.8%;margin:0;padding:0;height:7.5%;
+  background:var(--fpl-bg);border-radius:9px;box-shadow:none;
+  display:flex;align-items:center;justify-content:center}
+.framed .bc-plate .nm{font-size:16px;color:var(--fpl-fg);letter-spacing:.04em;line-height:1}
+.framed .bc-plate .fm{display:none}
+.framed .bc-art{padding-bottom:18%}
+.bigcard.framed{--fno-bg:#f5efdf;--fno-fg:#27355c;--fpl-bg:#f3ecd9;--fpl-fg:#2a3a64}
+.bigcard.framed.r-rara{--fno-bg:#eaf4ee;--fno-fg:#1d4a3a;--fpl-bg:#e9f1ea;--fpl-fg:#1d4a3a}
+.bigcard.framed.r-epica{--fno-bg:#3a1f63;--fno-fg:#ecd391;--fpl-bg:#2c1750;--fpl-fg:#e9c878}
+.bigcard.framed.r-dorada{--fno-bg:#f8efd2;--fno-fg:#8a6a1f;--fpl-bg:#f6eecf;--fpl-fg:#9a7423}
 .bc-no{position:absolute;top:9px;left:9px;width:34px;height:34px;border-radius:50%;z-index:2;
   background:var(--ivory);border:2px solid rgba(29,42,74,.35);color:var(--navy);
   font-family:'Cormorant Garamond';font-weight:700;font-size:19px;display:flex;align-items:center;justify-content:center;

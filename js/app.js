@@ -71,7 +71,8 @@ function freshState() {
     screen: "gate", tab: "album",
     code: null, name: "", avatar: null, selfie: null, entered: false,
     counts: {}, golds: [false, false, false, false, false],
-    sources: { start: true, ig: true, trivia: true },
+    sources: { start: true, ig: true },
+    lastSync: null,
     cartasFound: 0, usedCodes: [],
     gift: null, colgantes: 0, secLeft: SEC_TOTAL,
     prizes: { camara: null, reloj: null, peluche: null },
@@ -135,7 +136,7 @@ function applyPity(draws, minNew) {
 
 /* ---------------- feed ---------------- */
 function feedPush(html, ic, mine) {
-  S.feed.unshift({ html, ic, mine, t: Date.now() });
+  S.feed.unshift({ html, ic, mine, t: simTime || Date.now() });
   if (S.feed.length > 30) S.feed.pop();
   if (S.tab !== "feed" && S.screen === "app") { S.unread++; paintDot(); }
   if (S.tab === "feed" && S.screen === "app") renderTab();
@@ -178,11 +179,21 @@ function ambient() {
   if (r < .86) return feedPush(`<b>${A}</b> ya va <span class="g">${10 + Math.floor(Math.random() * 4)}/15</span>`, "🏆");
   return feedPush(`<b>${A}</b> abrió otro sobre y… repetida. Bancá ${A} 🥲`, "🫂");
 }
-let ambIv = null;
-function startAmbient() {
-  if (!ambIv) ambIv = setInterval(() => {
-    if (S.screen === "app" && !document.hidden) ambient();
-  }, 7000);
+/* Modelo pull para economizar datos: nada corre de fondo.
+   Al entrar a Reino o Premios se "sincroniza" lo que pasó desde
+   la última visita (en producción: un GET al backend). */
+let simTime = null;
+function syncWorld() {
+  const now = Date.now();
+  const last = S.lastSync || now;
+  let ticks = Math.min(12, Math.floor((now - last) / 8000));
+  if (!S.lastSync) ticks = 3;
+  for (let i = 0; i < ticks; i++) {
+    simTime = last + ((i + 1) * (now - last)) / (ticks + 1);
+    ambient();
+  }
+  simTime = null;
+  S.lastSync = now; save();
 }
 
 function newSalonReq() { return { who: rnd(GUESTS), figId: rnd(FIGS).id }; }
@@ -242,6 +253,7 @@ function renderHeader() {
 nav.querySelectorAll("button").forEach(b => {
   b.addEventListener("click", () => {
     S.tab = b.dataset.tab;
+    if (S.tab === "feed" || S.tab === "prizes") syncWorld();
     if (S.tab === "feed") { S.unread = 0; paintDot(); }
     nav.querySelectorAll("button").forEach(x => x.classList.toggle("act", x === b));
     renderTab();
@@ -301,7 +313,7 @@ function enterWithCode(code) {
   if (saved && saved.name && (saved.avatar || saved.selfie)) {
     S = saved; S.screen = "app";
     ensureSim();
-    startAmbient(); render();
+    render();
     toast(`¡Volviste, ${S.name}! ✨`);
     return;
   }
@@ -352,7 +364,7 @@ function renderOnboarding() {
     if (!S.avatar && !S.selfie) return toast("Elegí un personaje o sacate una selfie ✨");
     S.screen = "app"; S.tab = "album";
     ensureSim();
-    startAmbient(); save(); render();
+    save(); render();
     if (!S.entered) {
       S.entered = true; save();
       feedPush(`<b>Vos</b> entraste al Reino ✦ ¡bienvenida!`, "🏰", true);
@@ -407,7 +419,7 @@ function renderAlbum() {
     act = `<div class="wall center mt8"><div class="pill">👑 Reino completo</div>
       <p class="hint mt12">Ya tenés tu carta dorada esperándote en el Mercadito.</p></div>`;
   } else {
-    const order = ["start", "ig", "codigo", "carta", "trivia"];
+    const order = ["start", "ig", "codigo", "carta"];
     const onceDone = !S.sources.start && !S.sources.ig && S.cartasFound >= CARTAS_MAX;
     act = `
       <div class="sh"><span>Conseguir sobres</span><div class="ln"></div></div>
@@ -451,7 +463,6 @@ function routeSource(k) {
   if (k === "ig") return igFlow();
   if (k === "codigo") return codeRedeemFlow();
   if (k === "carta") return cartaFlow();
-  if (k === "trivia") return triviaFlow();
 }
 function showSheet(html) { sheet.innerHTML = html; sheet.classList.add("on"); }
 function hideSheet() {
@@ -651,53 +662,6 @@ function igFlow() {
   $("#igOk").addEventListener("click", () => openPack("ig"));
 }
 
-/* ---- trivia ---- */
-function triviaFlow() {
-  const t = rnd(TRIVIA), K = ["A", "B", "C", "D"], dur = 8000, C = 226;
-  showSheet(`
-    <div class="mcard">
-      <div class="kicker center">🎬 Trivia en pantalla · extra</div>
-      <h2 class="center" style="font-family:'Cormorant Garamond';font-weight:700;font-size:24px;line-height:1.1;margin:12px 0 0;color:#fff">${t.q}</h2>
-      <div class="opts" id="opts">${t.o.map((o, i) => `<div class="opt" data-i="${i}"><span class="k">${K[i]}</span>${o}</div>`).join("")}</div>
-      <div class="ringt"><svg width="74" height="74"><circle cx="37" cy="37" r="32" stroke="rgba(255,255,255,.1)" stroke-width="6" fill="none"/>
-        <circle id="trc" cx="37" cy="37" r="32" stroke="#f6dd99" stroke-width="6" fill="none" stroke-linecap="round"
-          stroke-dasharray="${C}" stroke-dashoffset="0"/></svg><div class="n" id="trn">8</div></div>
-    </div>`);
-  let alive = true; const start = performance.now();
-  (function anim(now) {
-    if (!alive) return;
-    const e = Math.min(1, (now - start) / dur);
-    const c = $("#trc"); if (!c) { alive = false; return; }
-    c.style.strokeDashoffset = (C * e).toFixed(1); $("#trn").textContent = Math.ceil(8 * (1 - e));
-    if (e < 1) requestAnimationFrame(anim); else { alive = false; triviaMiss("¡Se cerró la ronda!"); }
-  })(start);
-  sheet.querySelectorAll(".opt").forEach(el => el.addEventListener("click", () => {
-    if (!alive) return;
-    if (+el.dataset.i === t.a) { alive = false; triviaWin(); }
-    else { el.classList.add("bad"); vibrate(60); setTimeout(() => el.classList.remove("bad"), 420); }
-  }));
-  function triviaMiss(msg) {
-    showSheet(`
-      <div class="mcard center"><div class="kicker">💡 Trivia</div>
-        <p class="lead mt12">${msg}<br>Habrá más rondas en la noche.</p>
-        <button class="btn mt16" id="rt">Probar otra ronda</button>
-        <button class="btn ghost mt8" id="cl">Cerrar</button></div>`);
-    $("#rt").addEventListener("click", triviaFlow); $("#cl").addEventListener("click", hideSheet);
-  }
-  function triviaWin() {
-    showSheet(`<div class="mcard center"><div class="kicker">💡 Trivia</div>
-      <p class="lead mt12">¡Correcta! Sorteando entre los que acertaron…</p>
-      <div class="codebig mt12" style="letter-spacing:.04em">✦ ✦ ✦</div></div>`);
-    setTimeout(() => {
-      feedPush(`<b>Vos</b> ganaste la ronda de trivia 💡`, "🏆", true);
-      showSheet(`<div class="mcard center"><div class="kicker">🎉 ¡Saliste sorteada!</div>
-        <p class="lead mt12">Te llevás un <b style="color:var(--gold-1)">sobre extra 🎁</b></p>
-        <button class="btn mt16" id="op">Abrir mi sobre</button></div>`);
-      $("#op").addEventListener("click", () => openPack("trivia"));
-    }, 1500);
-  }
-}
-
 /* ---- sobres escondidos por el salón ---- */
 function cartaFlow() {
   showSheet(`
@@ -892,26 +856,34 @@ function codeSwap() {
   });
 }
 
-/* ---------------- el Reino (feed) ---------------- */
+/* ---------------- el Reino (feed + top 8) ----------------
+   Se carga al entrar a la sección (y con el botón actualizar):
+   nada viaja de fondo, para economizar datos. */
 function renderFeed() {
   view.innerHTML = `
-    <div class="sh" style="margin-top:4px"><span>Pasó en el Reino</span><div class="ln"></div></div>
+    <div class="sh" style="margin-top:4px"><span>Top 8 del Reino</span><div class="ln"></div>
+      <button class="btn ghost sm" id="syncBtn" style="padding:7px 12px">⟳ Actualizar</button></div>
+    <div class="card" style="padding-top:6px">${top8HTML()}</div>
+    <div class="sh"><span>Pasó en el Reino</span><div class="ln"></div></div>
     <div class="feed">${S.feed.map(e => `
       <div class="ev ${e.mine ? "mine" : ""}"><span class="ic">${e.ic}</span>
         <div>${e.html}<span class="t">${new Date(e.t).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</span></div></div>`).join("")
-      || `<p class="hint">Todavía no pasó nada… abrí tu sobre 🎁</p>`}</div>`;
+      || `<p class="hint">Todavía no pasó nada… abrí tu sobre 🎁</p>`}</div>
+    <p class="footnote">Se actualiza al entrar · sin gastar datos de fondo</p>`;
+  $("#syncBtn").addEventListener("click", () => {
+    syncWorld(); S.unread = 0; paintDot(); renderTab();
+    toast("Reino actualizado ✨");
+  });
 }
 
-/* ---------------- premios ---------------- */
-function renderPrizes() {
-  /* top 8: tablero simulado + vos, ordenado por figus */
+/* ---------------- top 8 (se muestra en El Reino) ---------------- */
+function top8HTML() {
   const rows = [
     ...(S.board || []).map(b => ({ who: b.who, n: b.n, done: b.done, me: false })),
     { who: "Vos", n: uniques(), done: S.done, me: true },
   ].sort((a, b) => b.n - a.n || (a.me ? -1 : 1)).slice(0, 8);
   const prizeOf = who => PRIZES_MAIN.find(p => S.prizes[p.key] === who);
-
-  const lb = rows.map((r, i) => {
+  return rows.map((r, i) => {
     const p = r.done ? prizeOf(r.me ? "Vos" : r.who) : null;
     const right = r.done
       ? `<span class="won">¡Ganó ${p ? p.nm + "! " + p.g : "— Reino completo! 👑"}</span>`
@@ -923,7 +895,10 @@ function renderPrizes() {
       <div class="bar"><i style="width:${Math.round(r.n / 15 * 100)}%"></i></div>
     </div>`;
   }).join("");
+}
 
+/* ---------------- premios ---------------- */
+function renderPrizes() {
   const prizesHtml = PRIZES_MAIN.map(p => {
     const w = S.prizes[p.key];
     return `<div class="req ${w ? "given" : ""}">
@@ -940,9 +915,7 @@ function renderPrizes() {
     : `<p class="hint">Todavía nadie sacó una dorada… puede ser tuya ✨</p>`;
 
   view.innerHTML = `
-    <div class="sh" style="margin-top:4px"><span>Top 8 del Reino</span><div class="ln"></div></div>
-    <div class="card" style="padding-top:6px">${lb}</div>
-    <div class="sh"><span>Premios principales</span><div class="ln"></div></div>
+    <div class="sh" style="margin-top:4px"><span>Premios principales</span><div class="ln"></div></div>
     <div class="card">${prizesHtml}</div>
     <div class="sh"><span>Colgantes RGB · quedan ${S.secLeft} de ${SEC_TOTAL}</span><div class="ln"></div></div>
     <div class="card center">
@@ -1120,7 +1093,6 @@ function confettiBurst(count = 110) {
   if (saved && saved.name && (saved.avatar || saved.selfie)) {
     S = saved; S.screen = "app";
     ensureSim();
-    startAmbient();
   } else {
     S = freshState(); S.code = code; S.screen = "onboarding";
   }

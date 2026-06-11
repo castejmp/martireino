@@ -71,3 +71,13 @@ const RARITY_WEIGHT = { comun: 10, rara: 4, epica: 1 };
 const RARITY_LABEL = { comun: "Común", rara: "Especial", epica: "Legendaria", dorada: "Dorada" };
 const RARITY_STARS = { comun: 1, rara: 2, epica: 3, dorada: 4 };
 const RARITY_STAR = { comun: "#e8d8ad", rara: "#bfe6d4", epica: "#c79bff", dorada: "#f6dd99" };
+
+/* Marcos reales escaneados (assets/frames/). El sello de rareza y el
+   "Colección de Aventuras" vienen impresos en el marco; la app solo
+   superpone número y nombre. Si el archivo falta, cae al marco CSS. */
+const RARITY_FRAME = {
+  comun:  "assets/frames/comun.jpg",
+  rara:   "assets/frames/especial.jpg",
+  epica:  "assets/frames/legendaria.jpg",
+  dorada: "assets/frames/oro.jpg",
+};

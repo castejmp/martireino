@@ -10,6 +10,10 @@ Carpeta para el arte real del juego. La app funciona sin estos archivos
   en el dorso de las cartas del reveal.
 - **`logo-m.svg`** — la misma "M" en vector; variante sólida usada como
   sello de lacre del sobre (inline desde `js/app.js`).
+- **`frames/`** — los 4 marcos por rareza (común, especial, legendaria,
+  oro), redimensionados a 760px y comprimidos a JPEG (56-103 KB). El
+  sello de rareza y "Colección de Aventuras" vienen impresos; la app
+  superpone número, nombre y arte. Originales en el historial de git.
 - **`figus/`** — cartas completas (marco + número + nombre + arte) en
   vertical ~3:4, una por figu: `01.png` … `15.png` y las doradas
   `16.png`, `17.png`, `18.png`. Para activar una: poner el archivo acá

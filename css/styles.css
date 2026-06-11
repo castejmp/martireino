@@ -382,6 +382,24 @@ h1.title{font-family:'Cormorant Garamond';font-weight:700;line-height:.9;margin:
 .swap .mini .who{font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-top:6px}
 .swap .ar{font-size:22px;color:var(--gold-1)}
 
+/* ---------- premios: top 8 + entregados ---------- */
+.lbrow{display:flex;align-items:center;gap:10px;padding:11px 12px 9px;border-radius:12px;margin-top:8px;
+  background:rgba(11,8,32,.5);border:1px solid rgba(255,255,255,.06);flex-wrap:wrap}
+.lbrow .rk{width:23px;height:23px;border-radius:7px;background:rgba(246,221,153,.13);color:var(--gold-1);flex:0 0 auto;
+  font-family:'Cormorant Garamond';font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+.lbrow .lnm{font-weight:800;font-size:13px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lbrow .ct{font-size:12px;font-weight:800;color:var(--muted)}
+.lbrow .bar{flex-basis:100%;height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.lbrow .bar i{display:block;height:100%;border-radius:2px;transition:width .6s ease;
+  background:linear-gradient(90deg,var(--rose),var(--gold-1))}
+.lbrow.me{border-color:rgba(246,221,153,.42);background:rgba(227,184,95,.09)}
+.lbrow.done{border-color:rgba(140,230,176,.55);background:rgba(140,230,176,.09)}
+.lbrow.done .rk{background:rgba(140,230,176,.16);color:var(--green)}
+.lbrow.done .won{font-size:11px;font-weight:900;color:var(--green);text-align:right}
+.lbrow.done .bar i{background:var(--green)}
+.req.given{opacity:.35;filter:grayscale(.85)}
+.req .chk{color:var(--green);font-weight:900;font-size:16px;flex:0 0 auto}
+
 /* ---------- gris si ya hay selfie ---------- */
 .dim{opacity:.32;filter:grayscale(.75);transition:opacity .25s, filter .25s}
 

@@ -74,7 +74,8 @@ function freshState() {
     sources: { start: true, ig: true, trivia: true },
     cartasFound: 0, usedCodes: [],
     gift: null, colgantes: 0, secLeft: SEC_TOTAL,
-    prizes: { camara: false, reloj: false, peluche: false },
+    prizes: { camara: null, reloj: null, peluche: null },
+    board: null, doraLog: [],
     myReq: null,
     salon: [], feed: [], unread: 0,
     done: false,
@@ -145,10 +146,29 @@ function paintDot() {
   d.style.display = S.unread ? "flex" : "none"; d.textContent = Math.min(S.unread, 9);
 }
 function ambient() {
+  /* el tablero simulado avanza de a poco */
+  if (S.board && Math.random() < .55) {
+    const alive = S.board.filter(b => !b.done);
+    if (alive.length) {
+      const b = rnd(alive);
+      b.n = Math.min(15, b.n + 1);
+      if (b.n === 15) {
+        b.done = true;
+        const p = claimMainPrize(b.who);
+        save();
+        if (S.tab === "prizes" && S.screen === "app") renderTab();
+        return feedPush(`<b>${b.who}</b> completó el Reino 👑${p ? ` — ¡ganó ${p.nm}!` : ""}`, "🎆");
+      }
+      save();
+      if (S.tab === "prizes" && S.screen === "app") renderTab();
+    }
+  }
   const r = Math.random(), A = rnd(GUESTS); let B = rnd(GUESTS); while (B === A) B = rnd(GUESTS);
   const f = rnd(FIGS);
   if (r < .07 && S.secLeft > 0) {
-    S.secLeft--; save();
+    S.secLeft--;
+    const g = rnd(GOLD);
+    logDorada(A, g.nm); save();
     if (S.tab === "prizes" && S.screen === "app") renderTab();
     return feedPush(`<b>${A}</b> sacó una dorada ✨ y se llevó un colgante RGB`, "📿");
   }
@@ -167,6 +187,26 @@ function startAmbient() {
 
 function newSalonReq() { return { who: rnd(GUESTS), figId: rnd(FIGS).id }; }
 function seedSalon() { S.salon = [newSalonReq(), newSalonReq(), newSalonReq()]; }
+
+/* tablero simulado de invitados para el top 8 */
+function seedBoard() {
+  const names = [...GUESTS].sort(() => Math.random() - .5);
+  S.board = names.map(who => ({ who, n: 3 + Math.floor(Math.random() * 5), done: false }));
+}
+function ensureSim() {
+  if (!Array.isArray(S.salon) || !S.salon.length) seedSalon();
+  if (!Array.isArray(S.board) || !S.board.length) seedBoard();
+}
+/* los principales se entregan por orden de llegada: 1º, 2º, 3º */
+function claimMainPrize(who) {
+  const p = PRIZES_MAIN.find(p => !S.prizes[p.key]);
+  if (p) S.prizes[p.key] = who;
+  return p || null;
+}
+function logDorada(who, nm) {
+  S.doraLog.unshift({ who, nm, t: Date.now() });
+  if (S.doraLog.length > 12) S.doraLog.pop();
+}
 
 /* ---------------- router ---------------- */
 function render() {
@@ -260,7 +300,7 @@ function enterWithCode(code) {
   const saved = load(code);
   if (saved && saved.name && (saved.avatar || saved.selfie)) {
     S = saved; S.screen = "app";
-    if (!S.salon.length) seedSalon();
+    ensureSim();
     startAmbient(); render();
     toast(`¡Volviste, ${S.name}! ✨`);
     return;
@@ -311,7 +351,7 @@ function renderOnboarding() {
     if (!S.name) return toast("Poné tu nombre 🙂");
     if (!S.avatar && !S.selfie) return toast("Elegí un personaje o sacate una selfie ✨");
     S.screen = "app"; S.tab = "album";
-    if (!S.salon.length) seedSalon();
+    ensureSim();
     startAmbient(); save(); render();
     if (!S.entered) {
       S.entered = true; save();
@@ -649,10 +689,9 @@ function triviaFlow() {
       <p class="lead mt12">¡Correcta! Sorteando entre los que acertaron…</p>
       <div class="codebig mt12" style="letter-spacing:.04em">✦ ✦ ✦</div></div>`);
     setTimeout(() => {
-      S.prizes.peluche = true; save();
-      feedPush(`<b>Vos</b> ganaste la ronda de trivia 💡 — ¡peluche Disney!`, "🏆", true);
+      feedPush(`<b>Vos</b> ganaste la ronda de trivia 💡`, "🏆", true);
       showSheet(`<div class="mcard center"><div class="kicker">🎉 ¡Saliste sorteada!</div>
-        <p class="lead mt12">Te llevás un <b style="color:var(--rose)">peluche Disney 🧸</b><br>y un sobre extra.</p>
+        <p class="lead mt12">Te llevás un <b style="color:var(--gold-1)">sobre extra 🎁</b></p>
         <button class="btn mt16" id="op">Abrir mi sobre</button></div>`);
       $("#op").addEventListener("click", () => openPack("trivia"));
     }, 1500);
@@ -678,6 +717,7 @@ function cartaFlow() {
 function doradaOverlay(idx) {
   S.colgantes++;
   if (S.secLeft > 0) S.secLeft--;
+  logDorada("Vos", GOLD[idx].nm);
   save();
   feedPush(`<span class="r">¡Vos sacaste una dorada!</span> ${GOLD[idx].nm} ${GOLD[idx].g} — colgante RGB 📿`, "✨", true);
   showSheet(`
@@ -864,14 +904,46 @@ function renderFeed() {
 
 /* ---------------- premios ---------------- */
 function renderPrizes() {
-  const main = PRIZES_MAIN.filter(p => !S.prizes[p.key]);
+  /* top 8: tablero simulado + vos, ordenado por figus */
+  const rows = [
+    ...(S.board || []).map(b => ({ who: b.who, n: b.n, done: b.done, me: false })),
+    { who: "Vos", n: uniques(), done: S.done, me: true },
+  ].sort((a, b) => b.n - a.n || (a.me ? -1 : 1)).slice(0, 8);
+  const prizeOf = who => PRIZES_MAIN.find(p => S.prizes[p.key] === who);
+
+  const lb = rows.map((r, i) => {
+    const p = r.done ? prizeOf(r.me ? "Vos" : r.who) : null;
+    const right = r.done
+      ? `<span class="won">¡Ganó ${p ? p.nm + "! " + p.g : "— Reino completo! 👑"}</span>`
+      : `<span class="ct">${r.n}/15</span>`;
+    return `<div class="lbrow ${r.done ? "done" : ""} ${r.me ? "me" : ""}">
+      <span class="rk">${i + 1}</span>
+      <span class="lnm">${esc(r.who)}</span>
+      ${right}
+      <div class="bar"><i style="width:${Math.round(r.n / 15 * 100)}%"></i></div>
+    </div>`;
+  }).join("");
+
+  const prizesHtml = PRIZES_MAIN.map(p => {
+    const w = S.prizes[p.key];
+    return `<div class="req ${w ? "given" : ""}">
+      <div class="fg" style="font-size:24px">${p.g}</div>
+      <div class="tx"><div class="a"><b>${p.nm}</b></div>
+      <div class="b">${w ? `✓ Entregado a ${esc(String(w === true ? "—" : w))}` : p.how}</div></div>
+      ${w ? `<span class="chk">✓</span>` : ""}</div>`;
+  }).join("");
+
+  const logHtml = S.doraLog.length
+    ? S.doraLog.map(e => `<div class="req"><div class="fg">✨</div>
+        <div class="tx"><div class="a"><b>${esc(e.who)}</b> sacó la dorada <b>${esc(e.nm)}</b></div>
+        <div class="b">📿 Colgante RGB · ${new Date(e.t).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</div></div></div>`).join("")
+    : `<p class="hint">Todavía nadie sacó una dorada… puede ser tuya ✨</p>`;
+
   view.innerHTML = `
-    <div class="sh" style="margin-top:4px"><span>Premios principales</span><div class="ln"></div></div>
-    ${main.length ? `<div class="card">
-      ${main.map(p => `<div class="req"><div class="fg" style="font-size:24px">${p.g}</div>
-        <div class="tx"><div class="a"><b>${p.nm}</b></div><div class="b">${p.how}</div></div></div>`).join("")}
-    </div>` : `<div class="wall center"><div class="pill">🎉 Todos entregados</div>
-      <p class="hint mt12">Los premios principales ya encontraron dueño.</p></div>`}
+    <div class="sh" style="margin-top:4px"><span>Top 8 del Reino</span><div class="ln"></div></div>
+    <div class="card" style="padding-top:6px">${lb}</div>
+    <div class="sh"><span>Premios principales</span><div class="ln"></div></div>
+    <div class="card">${prizesHtml}</div>
     <div class="sh"><span>Colgantes RGB · quedan ${S.secLeft} de ${SEC_TOTAL}</span><div class="ln"></div></div>
     <div class="card center">
       <div style="font-size:25px;letter-spacing:5px;line-height:1.5">${"📿".repeat(S.secLeft) || "✨ ¡Volaron todos! ✨"}</div>
@@ -880,6 +952,8 @@ function renderPrizes() {
       el resto se sortea durante la noche.</p>
       ${S.colgantes ? `<div class="pill mt12">📿 Vos ya ganaste ${S.colgantes}</div>` : ""}
     </div>
+    <div class="sh"><span>Ganadores con carta dorada</span><div class="ln"></div></div>
+    <div class="card">${logHtml}</div>
     <p class="footnote">Los premios se retiran en el Mercadito del Reino</p>`;
 }
 
@@ -967,8 +1041,12 @@ giftBar.addEventListener("click", () => {
 
 /* ---------------- completion ---------------- */
 function completion() {
-  S.done = true; S.prizes.camara = true; save();
-  feedPush(`<span class="r">¡COMPLETASTE EL REINO!</span> Las 15 figus de Marti son tuyas 👑`, "🎆", true);
+  S.done = true;
+  const prize = claimMainPrize("Vos");
+  const place = prize ? PRIZES_MAIN.findIndex(x => x.key === prize.key) + 1
+    : (S.board || []).filter(b => b.done).length + 1;
+  save();
+  feedPush(`<span class="r">¡COMPLETASTE EL REINO!</span> Las 15 figus de Marti son tuyas 👑${prize ? ` — ¡ganaste ${prize.nm}!` : ""}`, "🎆", true);
   showSheet(`
     <div class="rays"></div>
     <div style="position:relative;z-index:2" class="center">
@@ -978,9 +1056,11 @@ function completion() {
         <div class="nm">${esc(S.name)}</div>
         <div class="sub">Carta dorada de Marti</div>
         <div style="font-size:28px;margin-top:10px">🤍</div>
-        <div class="ser">N.º 001 · PRIMERA EN COMPLETAR</div>
+        <div class="ser">N.º ${String(place).padStart(3, "0")} EN COMPLETAR</div>
       </div>
-      <div class="pill mt16" style="font-size:13px;padding:10px 18px">📷 ¡Ganás la cámara de fotos!</div>
+      ${prize
+        ? `<div class="pill mt16" style="font-size:13px;padding:10px 18px">${prize.g} ¡Ganás ${prize.nm}!</div>`
+        : `<div class="pill mt16" style="font-size:13px;padding:10px 18px">👑 Reino completo — pasá por el Mercadito</div>`}
       <p class="lead mt12" style="max-width:280px;margin-left:auto;margin-right:auto">Pasá por el
         <b style="color:var(--gold-1)">Mercadito del Reino</b>: Marti te entrega la carta en mano.</p>
       <button class="btn mt16" id="stay" style="max-width:230px">Seguir mirando el Reino</button>
@@ -1039,7 +1119,7 @@ function confettiBurst(count = 110) {
   const saved = load(code);
   if (saved && saved.name && (saved.avatar || saved.selfie)) {
     S = saved; S.screen = "app";
-    if (!Array.isArray(S.salon) || !S.salon.length) seedSalon();
+    ensureSim();
     startAmbient();
   } else {
     S = freshState(); S.code = code; S.screen = "onboarding";

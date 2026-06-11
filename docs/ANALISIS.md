@@ -76,6 +76,12 @@ Diseño por fases para que el álbum dure toda la noche:
 - **Conectividad mala** (wifi saturado, 4G en sótano): la app ya es
   offline-first en estado; con backend, encolar mutaciones y sincronizar al
   reconectar. Nunca bloquear la UI esperando red.
+- **Modelo pull para economizar datos**: nada viaja de fondo. El Reino
+  (top 8 + feed) y Premios se sincronizan **al entrar a la sección** o con
+  el botón actualizar — en producción, un GET liviano con `since=<ts>`
+  que devuelve solo lo nuevo. Con 200 celus, esto evita 200 conexiones
+  WebSocket permanentes; el único push real necesario es el sobre regalo
+  (puede resolverse con un poll de baja frecuencia o Web Push).
 - **Picos**: cuando Marti dice el codeword, todos abren a la vez →
   servir estático desde CDN, fuentes con `preconnect` (ya está),
   ilustraciones comprimidas (<100 KB c/u) y precargadas al entrar.

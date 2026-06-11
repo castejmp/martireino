@@ -38,22 +38,13 @@ const AVATARS = [
 
 const GUESTS = ["Sofi", "Tomi", "Juli", "Cande", "Nacho", "Valen", "Mía", "Benja", "Lola", "Fran"];
 
-const TRIVIA = [
-  { q: "¿En qué película Marti sería una sirena?", o: ["La Sirenita", "Moana", "Frozen", "Encanto"], a: 0 },
-  { q: "¿Quién canta «Libre soy»?", o: ["Moana", "Elsa", "Rapunzel", "Tiana"], a: 1 },
-  { q: "¿De qué reino es Moana?", o: ["Arendelle", "Agrabah", "Motunui", "Corona"], a: 2 },
-  { q: "¿Cómo se llama el dragón de Mulán?", o: ["Abu", "Mushu", "Pascal", "Sven"], a: 1 },
-];
-
 /* Fuentes de sobres. n = figus por sobre · dor = prob. de dorada ·
-   once = se usa una sola vez. Pensado para jugar 100% desde el celu;
-   la pantalla grande es un extra si está disponible. */
+   once = se usa una sola vez. Pensado para jugar 100% desde el celu. */
 const SRC = {
   start:  { ic: "🎁", t: "Sobre de bienvenida",  d: "Tu sobre al entrar",                   n: 6, dor: 0.12, once: true },
   ig:     { ic: "📸", t: "Seguinos en Instagram", d: "@andro.show · +1 figu",               n: 1, dor: 0,    once: true },
   codigo: { ic: "🎤", t: "Canjear código",        d: "Entrevistas y sorpresas · +1 a +10",  n: 1, dor: 0.15 },
   carta:  { ic: "🃏", t: "Sobres escondidos",     d: "Buscalos por el salón · +2 c/u",      n: 2, dor: 0.2 },
-  trivia: { ic: "🎬", t: "Trivia en pantalla",    d: "Extra · si la pantalla está activa",  n: 4, dor: 0.12, once: true },
   gift:   { ic: "🎁", t: "Sobre de regalo",       d: "Cae desde el Reino",                  n: 4, dor: 0.12 },
 };
 const CARTAS_MAX = 3; /* sobres físicos escondidos canjeables por persona */

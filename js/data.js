@@ -1,34 +1,35 @@
 /* =====================================================
    Figus del Reino · datos del juego
-   Para usar arte real en una figu: poné la ruta en `img`
-   (ej: img:"assets/figus/01.jpg"). Si la imagen falta o
-   no carga, se muestra el emoji como fallback.
+   Cada carta va a ser un PNG completo (marco + número +
+   nombre + arte): cuando esté, poné la ruta en `img`
+   (ej: img:"assets/figus/01.png") y la app la usa a
+   pantalla completa. Si falta, se dibuja el marco en CSS.
+   `d` = brief para generar el arte de cada una.
    ===================================================== */
 
 const FIGS = [
-  { id: 1,  g: "🐚", nm: "Marti Sirena",      fm: "La Sirenita",            r: "comun", img: null },
-  { id: 2,  g: "❄️", nm: "Marti de Hielo",    fm: "Frozen",                 r: "comun", img: null },
-  { id: 3,  g: "🌺", nm: "Marti Navegante",   fm: "Moana",                  r: "comun", img: null },
-  { id: 4,  g: "🗡️", nm: "Marti Guerrera",    fm: "Mulán",                  r: "comun", img: null },
-  { id: 5,  g: "🪔", nm: "Marti Jazmín",      fm: "Aladdín",                r: "comun", img: null },
-  { id: 6,  g: "🌹", nm: "Marti Bella",       fm: "La Bella y la Bestia",   r: "comun", img: null },
-  { id: 7,  g: "👠", nm: "Marti Cenicienta",  fm: "Cenicienta",             r: "comun", img: null },
-  { id: 8,  g: "💜", nm: "Marti Rapunzel",    fm: "Enredados",              r: "comun", img: null },
-  { id: 9,  g: "🍎", nm: "Marti Blanca",      fm: "Blancanieves",           r: "rara",  img: null },
-  { id: 10, g: "🌿", nm: "Marti Aurora",      fm: "La Bella Durmiente",     r: "rara",  img: null },
-  { id: 11, g: "🍃", nm: "Marti Pocahontas",  fm: "Pocahontas",             r: "rara",  img: null },
-  { id: 12, g: "🏹", nm: "Marti Valiente",    fm: "Brave",                  r: "rara",  img: null },
-  { id: 13, g: "🐸", nm: "Marti Tiana",       fm: "La Princesa y el Sapo",  r: "rara",  img: null },
-  { id: 14, g: "🦋", nm: "Marti Encanto",     fm: "Encanto",                r: "epica", img: null },
-  { id: 15, g: "🖤", nm: "Marti Maléfica",    fm: "Maléfica",               r: "epica", img: null },
+  { id: 1,  g: "🐚", nm: "Marti Sirena",            fm: "Océano y perlas",        d: "Inspiración océano, perlas, peces tropicales",        r: "comun", img: null },
+  { id: 2,  g: "❄️", nm: "Marti de Nieve",          fm: "Copos y nieve",          d: "Copos flotando, nieve brillante",                     r: "comun", img: null },
+  { id: 3,  g: "🌺", nm: "Marti Navegante",         fm: "Mar e islas",            d: "Mar, islas, flores tropicales",                       r: "comun", img: null },
+  { id: 4,  g: "🗡️", nm: "Marti Guerrera",          fm: "Viento y pétalos",       d: "Aventura oriental, viento y pétalos",                 r: "comun", img: null },
+  { id: 5,  g: "🪔", nm: "Marti del Desierto",      fm: "Lámparas y dunas",       d: "Lámparas, dunas, estrellas",                          r: "comun", img: null },
+  { id: 6,  g: "🌹", nm: "Marti Encantada",         fm: "Rosas y castillo",       d: "Rosas, biblioteca, castillo elegante",                r: "comun", img: null },
+  { id: 7,  g: "👠", nm: "Marti de Cristal",        fm: "Baile y destellos",      d: "Baile, escalinata, destellos",                        r: "comun", img: null },
+  { id: 8,  g: "💜", nm: "Marti de la Torre",       fm: "Flores y linternas",     d: "Flores violetas, linternas, cabello al viento",       r: "comun", img: null },
+  { id: 9,  g: "🍎", nm: "Marti del Bosque Encantado", fm: "Bosque encantado",    d: "Bosque encantado, manzanas",                          r: "rara",  img: null },
+  { id: 10, g: "🌿", nm: "Marti Aurora",            fm: "Amanecer mágico",        d: "Amanecer en el bosque",                               r: "rara",  img: null },
+  { id: 11, g: "🍃", nm: "Marti del Viento",        fm: "Hojas al viento",        d: "Hojas y viento, naturaleza",                          r: "rara",  img: null },
+  { id: 12, g: "🏹", nm: "Marti Valiente",          fm: "Arco y aventura",        d: "Arco, aventura, bosque escocés",                      r: "rara",  img: null },
+  { id: 13, g: "🐸", nm: "Marti del Pantano Mágico", fm: "Luciérnagas y lirios",  d: "Pantano mágico, luciérnagas, lirios",                 r: "rara",  img: null },
+  { id: 14, g: "🦋", nm: "Marti de las Mariposas",  fm: "Mariposas doradas",      d: "Mariposas, flores doradas",                           r: "epica", img: null },
+  { id: 15, g: "🖤", nm: "Marti Oscura Glam",       fm: "Glam oscuro",            d: "Glam oscuro, elegancia",                              r: "epica", img: null },
 ];
 
+/* Doradas: numeradas a continuación del álbum (16, 17, 18) */
 const GOLD = [
-  { g: "👑", nm: "Marti · El Vals" },
-  { g: "🤍", nm: "Marti & Papá" },
-  { g: "💖", nm: "Marti & Mamá" },
-  { g: "✨", nm: "Marti Reina" },
-  { g: "🌙", nm: "Marti de Noche" },
+  { g: "👑", nm: "Marti Marina",      img: null },
+  { g: "🤍", nm: "Marti con Amigas",  img: null },
+  { g: "✨", nm: "Marti en Bs. As.",  img: null },
 ];
 
 const AVATARS = [
@@ -64,6 +65,9 @@ const SEC_TOTAL = 10; /* colgantes RGB Marti Disney */
    Épicas casi nunca: son el muro que obliga a cambiar. */
 const RARITY_WEIGHT = { comun: 10, rara: 4, epica: 1 };
 
-/* Estrella de rareza (esquina de la carta, como la figu impresa) */
-const RARITY_STAR = { comun: "#c9d2e0", rara: "#f1a8c6", epica: "#f6dd99" };
-const RARITY_LABEL = { comun: "Común", rara: "Rara", epica: "Épica" };
+/* Rarezas según los marcos impresos:
+   Común ★ (marfil+dorado) · Especial ★★ (lila+plata) ·
+   Legendaria ★★★ (violeta+oro) · Dorada ★★★★ (foil) */
+const RARITY_LABEL = { comun: "Común", rara: "Especial", epica: "Legendaria", dorada: "Dorada" };
+const RARITY_STARS = { comun: 1, rara: 2, epica: 3, dorada: 4 };
+const RARITY_STAR = { comun: "#e8d8ad", rara: "#bfe6d4", epica: "#c79bff", dorada: "#f6dd99" };

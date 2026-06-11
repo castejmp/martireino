@@ -62,8 +62,8 @@ Diseño por fases para que el álbum dure toda la noche:
   implementado client-side; el trigger real es un push del server.
 - **Pity rule** (implementada): un sobre nunca es 100% repetidas mientras
   el álbum arranca (mínimo 3 nuevas en bienvenida, 1 hasta tener 10).
-- **Doradas**: ahora son 5 y cada una gana un colgante RGB (de los 10).
-  ⚠️ En producción el server debe controlar el **stock global** (5 doradas
+- **Doradas**: son 3 y cada una gana un colgante RGB (de los 10).
+  ⚠️ En producción el server debe controlar el **stock global** (3 doradas
   en total entre 200 personas, soltadas a horarios elegidos); la
   probabilidad local del prototipo es solo para la demo.
 - **Códigos**: en producción son una lista emitida (valor asignado por

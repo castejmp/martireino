@@ -435,7 +435,7 @@ function bigCardHTML(c) {
       <div class="bigcard r-dorada" id="bc">
         <div class="tagwrap"><span class="tag dor">¡Dorada!</span></div>
         <div class="in">
-          <div class="bcface fr">${mSVG({ cls: "mfr" })}</div>
+          <div class="bcface fr"><img class="mfr" src="assets/logo-m.png" alt=""></div>
           <div class="bcface bk"><div class="bc-in">
             <div class="bc-star">✨</div>
             <div class="bc-art"><span class="glyph">${g.g}</span></div>
@@ -449,7 +449,7 @@ function bigCardHTML(c) {
     <div class="bigcard r-${f.r}" id="bc">
       <div class="tagwrap"><span class="tag ${c.nu ? "new" : "rep"}">${c.nu ? "¡Nueva!" : "Repetida"}</span></div>
       <div class="in">
-        <div class="bcface fr">${mSVG({ cls: "mfr" })}</div>
+        <div class="bcface fr"><img class="mfr" src="assets/logo-m.png" alt=""></div>
         <div class="bcface bk"><div class="bc-in">
           <div class="bc-no">${f.id}</div>
           <div class="bc-star" style="color:${RARITY_STAR[f.r]}">★</div>

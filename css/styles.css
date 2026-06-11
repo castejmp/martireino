@@ -88,7 +88,7 @@ h1.title{font-family:'Cormorant Garamond';font-weight:700;line-height:.9;margin:
 
 /* ---------- logo / marca Martina ---------- */
 .logo{display:flex;flex-direction:column;align-items:center;gap:4px}
-.logo img{max-width:190px;max-height:110px;object-fit:contain;
+.logo img{max-width:200px;max-height:160px;object-fit:contain;
   filter:drop-shadow(0 4px 20px rgba(213,13,162,.35))}
 .logo .mono{display:none}
 .logo.nologo img{display:none}
@@ -103,7 +103,7 @@ h1.title{font-family:'Cormorant Garamond';font-weight:700;line-height:.9;margin:
 
 /* M monograma en sello y dorso de cartas */
 .seal svg.ms{width:30px;height:auto;display:block}
-.bcface.fr svg.mfr{width:54%;height:auto;opacity:.95;
+.bcface.fr img.mfr,.bcface.fr svg.mfr{width:54%;height:auto;opacity:.95;
   filter:drop-shadow(0 0 22px rgba(213,13,162,.55))}
 
 /* ---------- controls ---------- */

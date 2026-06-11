@@ -48,20 +48,28 @@ Falta construir la **consola admin** (celu del DJ u organizador): botón
 trivia", "soltar dorada". Y la **vista pantalla grande**: feed gigante +
 "SE BUSCA" con los pedidos.
 
-## 3. Economía del juego
+## 3. Economía del juego (200 invitados, sin pantalla)
 
-- 4 sobres × 4–5 figus ≈ **17 figus por invitado** para 15 necesarias, con
-  repetidas → el muro de intercambio funciona (las épicas con peso 1 casi
-  no salen: se consiguen cambiando).
+Diseño por fases para que el álbum dure toda la noche:
+
+- **Fase 1 (entrada)**: bienvenida 6 figus + Instagram +1 + hasta 3 sobres
+  escondidos (+2 c/u) ≈ 13 figus brutas → con repetidas, la mayoría queda
+  en **8/9 únicas como techo** (las épicas con peso 1 casi no salen).
+- **Fase 2 (1–2 hs)**: completar se vuelve lento a propósito — códigos de
+  entrevistas (+1/+3/+5/+10) e intercambios cierran los huecos de a poco.
+- **Válvula de ritmo**: si decae, el backend lanza el **sobre regalo**
+  ("recibís un sobre en 3:00" con contador en pantalla). Ya está
+  implementado client-side; el trigger real es un push del server.
 - **Pity rule** (implementada): un sobre nunca es 100% repetidas mientras
-  el álbum arranca (mínimo 3 nuevas en el de bienvenida, 1 hasta tener 10).
-  Sin esto, un sobre todo-repetidas a las 22:30 mata el entusiasmo.
-- ⚠️ **Doradas**: con 18–35% por sobre, en 100 invitados salen ~80 doradas
-  y "la primera dorada gana el Reloj" se define en los primeros 5 minutos.
-  En el evento real el server debe soltar doradas **a horarios elegidos**
-  (ej: una por hora) — la probabilidad local es solo para la demo.
-- Invitados que llegan tarde o pierden rondas: el DJ debe tener códigos de
-  sobre extra para repartir a mano.
+  el álbum arranca (mínimo 3 nuevas en bienvenida, 1 hasta tener 10).
+- **Doradas**: ahora son 5 y cada una gana un colgante RGB (de los 10).
+  ⚠️ En producción el server debe controlar el **stock global** (5 doradas
+  en total entre 200 personas, soltadas a horarios elegidos); la
+  probabilidad local del prototipo es solo para la demo.
+- **Códigos**: en producción son una lista emitida (valor asignado por
+  código, un solo uso, validados por el server). En la demo el sufijo
+  numérico define el valor (ANDRO5 → +5).
+- Invitados que llegan tarde: el organizador reparte códigos extra a mano.
 
 ## 4. Condiciones reales del salón
 

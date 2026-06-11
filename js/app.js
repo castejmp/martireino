@@ -19,10 +19,27 @@ function toast(m) {
 }
 function vibrate(p) { if (navigator.vibrate) try { navigator.vibrate(p); } catch (e) { } }
 
+/* Marca: trazo "M" recreado en vector del logo de Martina.
+   Si existe assets/logo.png (el wordmark original), lo usa en su lugar. */
+const M_PATH = "M30 122 C33 62 45 30 58 28 C73 26 86 72 98 100 C106 117 113 115 121 88 C131 53 139 31 149 31 C160 31 165 62 168 126";
+function mSVG(opts = {}) {
+  const grad = !opts.solid;
+  const id = "mg" + (mSVG._n = (mSVG._n || 0) + 1);
+  return `<svg viewBox="0 0 200 150" fill="none" aria-hidden="true"${opts.cls ? ` class="${opts.cls}"` : ""}>
+    ${grad ? `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d50da2"/><stop offset=".55" stop-color="#d50da2"/>
+      <stop offset=".8" stop-color="#ee7d97"/><stop offset="1" stop-color="#e8639a"/></linearGradient></defs>` : ""}
+    <path d="${M_PATH}" stroke="${grad ? `url(#${id})` : opts.solid}"
+      stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
 const logoHTML = `
   <div class="logo nologo">
-    <img src="assets/logo.png" alt="Marti XV" onload="this.parentElement.classList.remove('nologo')">
-    <div class="mono">M·XV</div>
+    <img src="assets/logo.png" alt="Martina Fifteen" onload="this.parentElement.classList.remove('nologo')">
+    <div class="mono">
+      ${mSVG({ cls: "mm" })}
+      <div class="wm">Martina</div>
+      <div class="wm2">Fifteen</div>
+    </div>
   </div>`;
 
 /* ---------------- acceso por pulsera ---------------- */
@@ -383,7 +400,7 @@ function openPack(srcKey) {
   const meta = SRC[srcKey];
   showSheet(`
     <div class="kicker">${srcKey === "start" ? "Tu sobre de bienvenida" : "¡Un sobre más!"}</div>
-    <div class="env" id="env"><div class="flapline"></div><div class="seal">✦</div></div>
+    <div class="env" id="env"><div class="flapline"></div><div class="seal">${mSVG({ solid: "#2a1c08", cls: "ms" })}</div></div>
     <p class="lead" style="max-width:250px">Tocá el sello para abrirlo</p>`);
   const env = $("#env");
   env.addEventListener("click", function once() {
@@ -418,7 +435,7 @@ function bigCardHTML(c) {
       <div class="bigcard r-dorada" id="bc">
         <div class="tagwrap"><span class="tag dor">¡Dorada!</span></div>
         <div class="in">
-          <div class="bcface fr"><span class="mono">M</span></div>
+          <div class="bcface fr">${mSVG({ cls: "mfr" })}</div>
           <div class="bcface bk"><div class="bc-in">
             <div class="bc-star">✨</div>
             <div class="bc-art"><span class="glyph">${g.g}</span></div>
@@ -432,7 +449,7 @@ function bigCardHTML(c) {
     <div class="bigcard r-${f.r}" id="bc">
       <div class="tagwrap"><span class="tag ${c.nu ? "new" : "rep"}">${c.nu ? "¡Nueva!" : "Repetida"}</span></div>
       <div class="in">
-        <div class="bcface fr"><span class="mono">M</span></div>
+        <div class="bcface fr">${mSVG({ cls: "mfr" })}</div>
         <div class="bcface bk"><div class="bc-in">
           <div class="bc-no">${f.id}</div>
           <div class="bc-star" style="color:${RARITY_STAR[f.r]}">★</div>

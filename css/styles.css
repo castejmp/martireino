@@ -86,16 +86,25 @@ h1.title{font-family:'Cormorant Garamond';font-weight:700;line-height:.9;margin:
 .sh .ln{flex:1;height:1px;background:var(--line)}
 .sh span{font-weight:800;font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-2)}
 
-/* ---------- logo ---------- */
+/* ---------- logo / marca Martina ---------- */
 .logo{display:flex;flex-direction:column;align-items:center;gap:4px}
 .logo img{max-width:190px;max-height:110px;object-fit:contain;
-  filter:drop-shadow(0 4px 20px rgba(227,184,95,.3))}
+  filter:drop-shadow(0 4px 20px rgba(213,13,162,.35))}
 .logo .mono{display:none}
 .logo.nologo img{display:none}
-.logo.nologo .mono{display:block;font-family:'Cormorant Garamond';font-weight:700;font-size:54px;line-height:1;
-  background:linear-gradient(180deg,#fff,var(--gold-1) 55%,var(--gold-2));
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
-  filter:drop-shadow(0 2px 16px rgba(227,184,95,.3))}
+.logo.nologo .mono{display:flex;flex-direction:column;align-items:center;
+  filter:drop-shadow(0 4px 22px rgba(213,13,162,.4))}
+.logo .mono svg.mm{width:74px;height:auto;margin-bottom:-6px}
+.logo .mono .wm{font-family:'Chewy',cursive;font-size:46px;line-height:1;letter-spacing:.01em;
+  background:linear-gradient(115deg,#d50da2 55%,#ee7d97 82%,#e8639a);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.logo .mono .wm2{font-family:'Chewy',cursive;font-size:15px;letter-spacing:.42em;text-transform:uppercase;
+  color:#d50da2;margin-top:3px;padding-left:.42em}
+
+/* M monograma en sello y dorso de cartas */
+.seal svg.ms{width:30px;height:auto;display:block}
+.bcface.fr svg.mfr{width:54%;height:auto;opacity:.95;
+  filter:drop-shadow(0 0 22px rgba(213,13,162,.55))}
 
 /* ---------- controls ---------- */
 .btn{appearance:none;border:0;cursor:pointer;font-family:'Mulish';font-weight:800;font-size:15px;
@@ -258,11 +267,9 @@ h1.title{font-family:'Cormorant Garamond';font-weight:700;line-height:.9;margin:
 .bcface{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   overflow:hidden}
 .bcface.fr{display:flex;align-items:center;justify-content:center;
-  background:repeating-linear-gradient(45deg,rgba(246,221,153,.07) 0 9px,transparent 9px 18px),
+  background:repeating-linear-gradient(45deg,rgba(213,13,162,.09) 0 9px,transparent 9px 18px),
     linear-gradient(165deg,#241a4d,#140d31);
   border:1px solid rgba(255,255,255,.12)}
-.bcface.fr .mono{font-family:'Cormorant Garamond';font-weight:700;font-size:54px;color:var(--gold-2);
-  text-shadow:0 0 26px rgba(227,184,95,.5)}
 .bcface.bk{transform:rotateY(180deg);padding:7px;
   background:linear-gradient(160deg,#dfe6ef,#9aa7b8 30%,#e8edf3 52%,#8d99ab 75%,#d4dce6)}
 .bigcard.r-rara .bcface.bk{background:linear-gradient(160deg,#f6cfde,#d987ab 30%,#fbe3ec 52%,#c8769d 75%,#f3c4d6)}

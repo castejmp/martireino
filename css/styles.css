@@ -313,10 +313,42 @@ h1.title{font-family:'Cormorant Garamond';font-weight:700;line-height:.9;margin:
 .framed .bc-plate .nm{font-size:16px;color:var(--fpl-fg);letter-spacing:.04em;line-height:1}
 .framed .bc-plate .fm{display:none}
 .framed .bc-art{padding-bottom:18%}
-.bigcard.framed{--fno-bg:#f5efdf;--fno-fg:#27355c;--fpl-bg:#f3ecd9;--fpl-fg:#2a3a64}
-.bigcard.framed.r-rara{--fno-bg:#eaf4ee;--fno-fg:#1d4a3a;--fpl-bg:#e9f1ea;--fpl-fg:#1d4a3a}
-.bigcard.framed.r-epica{--fno-bg:#3a1f63;--fno-fg:#ecd391;--fpl-bg:#2c1750;--fpl-fg:#e9c878}
-.bigcard.framed.r-dorada{--fno-bg:#f8efd2;--fno-fg:#8a6a1f;--fpl-bg:#f6eecf;--fpl-fg:#9a7423}
+
+/* colores de disco/placa según el marco (compartidos por carta grande,
+   mini del álbum, resumen del sobre y doradas) */
+.framed{--fno-bg:#f5efdf;--fno-fg:#27355c;--fpl-bg:#f3ecd9;--fpl-fg:#2a3a64}
+.framed.r-rara{--fno-bg:#eaf4ee;--fno-fg:#1d4a3a;--fpl-bg:#e9f1ea;--fpl-fg:#1d4a3a}
+.framed.r-epica{--fno-bg:#3a1f63;--fno-fg:#ecd391;--fpl-bg:#2c1750;--fpl-fg:#e9c878}
+.framed.r-dorada{--fno-bg:#f8efd2;--fno-fg:#8a6a1f;--fpl-bg:#f6eecf;--fpl-fg:#9a7423}
+
+/* número y nombre en miniatura sobre el marco real */
+.framed .fno{position:absolute;left:5.6%;top:6%;width:14.5%;aspect-ratio:1;border-radius:50%;z-index:2;
+  display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond';font-weight:700;
+  background:radial-gradient(circle,var(--fno-bg) 58%,transparent 72%);color:var(--fno-fg);font-size:10px}
+.framed .fplate{position:absolute;left:15%;right:15%;bottom:13.8%;height:7.5%;z-index:2;border-radius:4px;
+  background:var(--fpl-bg);color:var(--fpl-fg);font-family:'Cormorant Garamond';font-weight:700;
+  display:flex;align-items:center;justify-content:center;font-size:7.5px;letter-spacing:.02em;
+  white-space:nowrap;overflow:hidden;padding:0 3px}
+
+/* álbum: mini carta con marco real */
+.fig.framed{border:0;padding:0;background-size:cover;background-position:center}
+.fig.framed:after{display:none}
+.fig.framed.r-rara,.fig.framed.r-epica{box-shadow:none}
+.fig.framed .glyph{font-size:30px;margin-bottom:18%;filter:drop-shadow(0 4px 8px rgba(60,40,20,.35))}
+.fig.framed .fno{font-size:11px}
+.fig.framed .fplate{font-size:8px}
+
+/* doradas del álbum con marco real */
+.gcard.framed{border:0;background-size:cover;background-position:center}
+.gcard.framed .glyph{font-size:28px;margin-bottom:16%;filter:drop-shadow(0 4px 8px rgba(60,40,20,.35))}
+.gcard.framed .fno{font-size:10px}
+.gcard.framed .fplate{font-size:7px}
+
+/* resumen del sobre: flips con marco real */
+.framed .face.bk{background-size:cover;background-position:center;border:0}
+.framed .face.bk .g{font-size:26px;margin-bottom:20%;filter:drop-shadow(0 3px 7px rgba(60,40,20,.35))}
+.framed .face.bk .tag{position:absolute;bottom:3.5%;left:50%;transform:translateX(-50%);z-index:3;
+  background:rgba(11,8,32,.88);padding:2px 7px;border-radius:7px;margin:0;white-space:nowrap}
 .bc-no{position:absolute;top:9px;left:9px;width:34px;height:34px;border-radius:50%;z-index:2;
   background:var(--ivory);border:2px solid rgba(29,42,74,.35);color:var(--navy);
   font-family:'Cormorant Garamond';font-weight:700;font-size:19px;display:flex;align-items:center;justify-content:center;

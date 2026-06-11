@@ -401,10 +401,11 @@ function figCard(f) {
   const no = String(f.id).padStart(2, "0");
   if (!q) return `<div class="fig empty"><span class="no">${no}</span>
     <span class="q">?</span><div class="fm" style="margin-top:6px">${esc(f.fm)}</div></div>`;
-  return `<div class="fig have r-${f.r}"><span class="no">${no}</span>
-    <span class="st" style="color:${RARITY_STAR[f.r]}">${"★".repeat(RARITY_STARS[f.r])}</span>
+  return `<div class="fig have framed r-${f.r}" style="background-image:url('${RARITY_FRAME[f.r]}')">
+    <span class="fno">${f.id}</span>
     ${f.img ? `<img class="art" src="${f.img}" alt="" onerror="this.remove()">` : ""}
-    <span class="glyph">${f.g}</span><div class="fn">${esc(f.nm)}</div><div class="fm">${esc(f.fm)}</div>
+    <span class="glyph">${f.g}</span>
+    <div class="fplate">${esc(f.nm)}</div>
     ${q > 1 ? `<span class="dq">x${q}</span>` : ""}</div>`;
 }
 function srcAvailable(k) {
@@ -448,10 +449,11 @@ function renderAlbum() {
     ${act}
     <div class="sh"><span>Doradas · pura suerte</span><div class="ln"></div></div>
     <div class="goldrow">
-      ${GOLD.map((g, i) => `<div class="gcard ${S.golds[i] ? "won" : "locked"}">
-        <span class="no">${16 + i}</span>
+      ${GOLD.map((g, i) => `<div class="gcard framed r-dorada ${S.golds[i] ? "won" : "locked"}"
+        style="background-image:url('${RARITY_FRAME.dorada}')">
+        <span class="fno">${16 + i}</span>
         <span class="lk">${S.golds[i] ? "✨" : "🔒"}</span><span class="glyph">${g.g}</span>
-        <div class="fn">${g.nm}</div></div>`).join("")}
+        <div class="fplate">${g.nm}</div></div>`).join("")}
     </div>
     <p class="footnote">No hacen falta para ganar · cada dorada se lleva un colgante RGB de Marti 📿</p>`;
   view.querySelectorAll(".src").forEach(el => el.addEventListener("click", () => routeSource(el.dataset.src)));
@@ -582,16 +584,21 @@ function revealStep() {
 function revealSummary() {
   const { queue, dorIdx } = RV;
   const small = queue.map((c, i) => {
-    if (c.kind === "gold") return `
-      <div class="flip dorada go" style="animation-delay:${i * .06}s"><div class="inner">
-        <div class="face fr"><span class="mono">✦</span></div>
-        <div class="face bk"><span class="g">${GOLD[c.idx].g}</span><div class="nm">${GOLD[c.idx].nm}</div>
-          <div class="tag">¡Dorada!</div></div></div></div>`;
+    const isGold = c.kind === "gold";
+    const f = isGold ? GOLD[c.idx] : c.f;
+    const r = isGold ? "dorada" : c.f.r;
+    const no = isGold ? 16 + c.idx : c.f.id;
+    const cls = isGold ? "dorada" : `${c.nu ? "new" : "rep"} ${c.f.r}`;
+    const tag = isGold ? "¡Dorada!" : (c.nu ? "¡Nueva!" : "Repetida");
     return `
-      <div class="flip ${c.nu ? "new" : "rep"} ${c.f.r} go" style="animation-delay:${i * .06}s"><div class="inner">
+      <div class="flip ${cls} go framed r-${r}" style="animation-delay:${i * .06}s"><div class="inner">
         <div class="face fr"><span class="mono">✦</span></div>
-        <div class="face bk"><span class="g">${c.f.g}</span><div class="nm">${esc(c.f.nm)}</div>
-          <div class="tag">${c.nu ? "¡Nueva!" : "Repetida"}</div></div></div></div>`;
+        <div class="face bk" style="background-image:url('${RARITY_FRAME[r]}')">
+          <span class="fno">${no}</span>
+          <span class="g">${f.g}</span>
+          <div class="fplate">${esc(f.nm)}</div>
+          <div class="tag">${tag}</div>
+        </div></div></div>`;
   }).join("");
   showSheet(`
     <div class="kicker">Tu sobre</div>

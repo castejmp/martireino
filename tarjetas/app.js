@@ -1,9 +1,9 @@
 /* =====================================================
    Generador de tarjetas Martina XV
    Filename esperado: qr-NOMBRE_APELLIDO-MESA_N(.ext)
-   Salida: PDF imprimible (frente + dorso, double-side
-   con flip por borde largo) + ZIP opcional de PNGs.
-   Todo se procesa en el navegador: nada sube a un server.
+   Salida: ZIP de PNGs individuales (1086×1448px)
+   nombrados Película-NOMBRE_APELLIDO.png
+   Todo se procesa en el navegador.
    ===================================================== */
 
 const $ = s => document.querySelector(s);
@@ -18,10 +18,8 @@ const el = (tag, attrs = {}, html = "") => {
   return e;
 };
 
-/* ---------------- mapa por defecto: 18 mesas (la 18 = mesa principal) ----------------
-   El usuario lo edita en vivo en el textarea, así no hace falta deploy
-   para cambiar nombres o números. Las rarezas son las que ya usa la app
-   del juego (común/especial/legendaria/dorada). */
+const PNG_W = 1086, PNG_H = 1448;
+
 const DEFAULT_MAP = `1: Enredados | dorada
 2: Moana | comun
 3: Ratatouille | comun
@@ -43,15 +41,13 @@ const DEFAULT_MAP = `1: Enredados | dorada
 19: La Sirenita | rara
 20: Lilo & Stitch | comun`;
 
-
 /* ---------------- state ---------------- */
-let qrs = [];     // [{ filename, name, mesa, dataUrl }]
-let bad = [];     // [{ filename, reason }]
-let mesaMap = {}; // { 8: { nombre:"Maléfica", rareza:"epica" } }
+let qrs = [];
+let bad = [];
+let mesaMap = {};
 
 /* ---------------- parser de filename ---------------- */
 function parseFilename(name) {
-  // qr-NOMBRE_APELLIDO[_OTRO]-MESA_N(.ext)
   const m = name.replace(/\.[^.]+$/, "").match(/^qr-(.+?)-MESA[_-]?(\d+)$/i);
   if (!m) return null;
   const personName = m[1]
@@ -59,7 +55,8 @@ function parseFilename(name) {
     .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
     .join(" ")
     .trim();
-  return { name: personName, mesa: parseInt(m[2], 10) };
+  const rawName = m[1].toUpperCase();
+  return { name: personName, rawName, mesa: parseInt(m[2], 10) };
 }
 
 /* ---------------- mesa map parser ---------------- */
@@ -96,7 +93,7 @@ async function ingest(fileList) {
     const parsed = parseFilename(f.name);
     if (!parsed) { bad.push({ filename: f.name, reason: "no matchea qr-NOMBRE_APELLIDO-MESA_N" }); continue; }
     const dataUrl = await readAsDataURL(f);
-    qrs.push({ filename: f.name, name: parsed.name, mesa: parsed.mesa, dataUrl });
+    qrs.push({ filename: f.name, name: parsed.name, rawName: parsed.rawName, mesa: parsed.mesa, dataUrl });
   }
   qrs.sort((a, b) => a.mesa - b.mesa || a.name.localeCompare(b.name, "es"));
   paintCounts();
@@ -107,13 +104,11 @@ function paintCounts() {
   const c = $("#counts");
   if (!qrs.length && !bad.length) { c.textContent = ""; return; }
 
-  // conteo por mesa
   const porMesa = {};
   qrs.forEach(q => { porMesa[q.mesa] = (porMesa[q.mesa] || 0) + 1; });
   const mesas = Object.keys(porMesa).map(n => +n).sort((a, b) => a - b);
   const sinMapeoSet = new Set(qrs.filter(q => !mesaMap[q.mesa]).map(q => q.mesa));
 
-  // duplicados (mismo nombre en mesas distintas o repetido)
   const byName = {};
   qrs.forEach(q => { (byName[q.name] = byName[q.name] || []).push(q); });
   const dupes = Object.entries(byName).filter(([, arr]) => arr.length > 1);
@@ -164,35 +159,59 @@ function escapeHTML(s) {
 function paintPreview() {
   const p = $("#preview");
   p.innerHTML = "";
-  const per = +$("#per").value;
-  p.parentElement.className = "step size-" + per;
   if (!qrs.length) {
     p.innerHTML = `<div class="empty">Cargá los QR para ver la vista previa de la primera tarjeta.</div>`;
     return;
   }
-  const q = qrs[0];
-  p.appendChild(cardFront(q));
+  p.appendChild(cardFront(qrs[0]));
 }
 
-/* ---------------- preparar sheets para imprenta ---------------- */
-function buildSheets() {
-  const per = +$("#per").value;
-  const cols = 2;
-  const rows = per === 4 ? 2 : per === 6 ? 3 : 4;
-  const cls = `sheet cols-${cols} rows-${rows} size-${per}`;
-  const sheetsRoot = $("#sheets");
-  sheetsRoot.innerHTML = "";
+/* ---------------- PNG filename ---------------- */
+function pngName(q) {
+  const m = mesaMap[q.mesa];
+  const pelicula = m ? m.nombre.replace(/\s+/g, '_') : `Mesa_${q.mesa}`;
+  return `${pelicula}-${q.rawName}.png`;
+}
 
-  for (let i = 0; i < qrs.length; i += per) {
-    const batch = qrs.slice(i, i + per);
-    const page = el("div", { class: cls });
-    batch.forEach(q => {
-      const slot = el("div", { class: "slot" });
-      slot.appendChild(cardFront(q));
-      page.appendChild(slot);
-    });
-    sheetsRoot.appendChild(page);
+/* ---------------- render card to PNG blob at 1086×1448 ---------------- */
+async function renderCard(q) {
+  const card = cardFront(q);
+  card.style.width = PNG_W + "px";
+  card.style.height = PNG_H + "px";
+  const sandbox = el("div", {
+    style: `position:fixed;left:-9999px;top:0;width:${PNG_W}px;height:${PNG_H}px`
+  });
+  document.body.appendChild(sandbox);
+  sandbox.appendChild(card);
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  const canvas = await html2canvas(card, {
+    width: PNG_W,
+    height: PNG_H,
+    scale: 1,
+    useCORS: true,
+    backgroundColor: "#ffffff"
+  });
+  sandbox.remove();
+  return new Promise(res => canvas.toBlob(res, "image/png"));
+}
+
+/* ---------------- build ZIP ---------------- */
+async function buildZip() {
+  const zip = new JSZip();
+  const prog = $("#progress");
+  for (let i = 0; i < qrs.length; i++) {
+    prog.textContent = `Generando ${i + 1} de ${qrs.length}…`;
+    const blob = await renderCard(qrs[i]);
+    zip.file(pngName(qrs[i]), blob);
   }
+  prog.textContent = "Comprimiendo ZIP…";
+  const out = await zip.generateAsync({ type: "blob" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(out);
+  a.download = "tarjetas_marti_xv.zip";
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  prog.textContent = `✓ ${qrs.length} tarjetas generadas`;
 }
 
 /* ---------------- wiring ---------------- */
@@ -217,12 +236,13 @@ function init() {
     mesaMap = parseMap(e.target.value);
     paintCounts(); paintPreview();
   });
-  $("#per").addEventListener("change", paintPreview);
 
-  $("#go").addEventListener("click", () => {
+  $("#go").addEventListener("click", async () => {
     if (!qrs.length) return alert("Cargá los QR primero");
-    buildSheets();
-    requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+    const btn = $("#go");
+    btn.disabled = true;
+    try { await buildZip(); } catch (e) { alert("Error: " + e.message); }
+    btn.disabled = false;
   });
   paintPreview();
 }

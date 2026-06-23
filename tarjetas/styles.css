@@ -44,15 +44,14 @@ textarea:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(213,13,162,
 .preview .empty{color:var(--muted);font-size:13px;font-weight:600;padding:30px;text-align:center;width:100%}
 
 .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.actions label{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--navy)}
-.actions select{padding:9px 11px;border-radius:10px;border:1px solid var(--line);background:#fafafe;font-weight:700;font-size:13px}
 .btn{appearance:none;border:0;padding:11px 18px;border-radius:12px;font-family:'Mulish';font-weight:800;font-size:14px;
   cursor:pointer;transition:transform .1s, filter .15s}
 .btn:active{transform:translateY(1px)}
 .btn.primary{background:linear-gradient(180deg,var(--magenta),#b30887);color:#fff;
   box-shadow:0 8px 22px rgba(213,13,162,.32)}
-.btn.ghost{background:#fff;color:var(--magenta);box-shadow:inset 0 0 0 1.5px var(--magenta)}
 .btn[disabled]{opacity:.4;pointer-events:none}
+
+.progress{margin-top:10px;font-size:13px;font-weight:700;color:var(--magenta)}
 
 /* ============= CARD ============= */
 .card{
@@ -62,53 +61,14 @@ textarea:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(213,13,162,
   font-family:'Mulish',sans-serif}
 
 .card.front{
-  display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 18px 14px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:5% 6%;gap:3%;
   background:radial-gradient(circle at 50% 0%,#ffe9f4,#fff 55%)}
-.card.front .lo{width:46%;max-height:64px;object-fit:contain;flex:0 0 auto}
-.card.front .nombre{margin:14px 0 0;font-family:'Cormorant Garamond';font-weight:700;font-size:26px;line-height:1.02;
+.card.front .lo{width:46%;object-fit:contain}
+.card.front .nombre{font-family:'Cormorant Garamond';font-weight:700;font-size:26px;line-height:1.05;
   color:var(--navy);letter-spacing:.01em;word-break:break-word}
-.card.front .mesa{margin:8px 0 0;font-family:'Chewy',cursive;font-size:22px;color:var(--magenta);line-height:1;
+.card.front .mesa{font-family:'Chewy',cursive;font-size:22px;color:var(--magenta);line-height:1;
   letter-spacing:.02em;text-transform:uppercase}
-.card.front .qrwrap{margin:auto 0;padding:8px;background:#fff;border:1px solid #f0e9d4;border-radius:10px;
+.card.front .qrwrap{padding:8px;background:#fff;border:1px solid #f0e9d4;border-radius:10px;
   box-shadow:0 2px 0 rgba(0,0,0,.04)}
 .card.front .qrwrap img{display:block;width:160px;height:160px;image-rendering:pixelated}
-
-/* tamaños distintos según "per page" */
-.size-6 .card{--w:340px}
-.size-6 .card.front .nombre{font-size:22px}
-.size-6 .card.front .mesa{font-size:18px}
-.size-6 .card.front .qrwrap img{width:130px;height:130px}
-
-.size-8 .card{--w:265px}
-.size-8 .card.front .lo{max-height:48px}
-.size-8 .card.front .nombre{font-size:20px;margin-top:10px}
-.size-8 .card.front .mesa{font-size:16px}
-.size-8 .card.front .qrwrap img{width:130px;height:130px}
-
-/* ============= SHEET (print) ============= */
-.sheets{display:none}
-
-@page{ size:A4 portrait; margin:0 }
-
-@media print{
-  .ui{display:none}
-  body{background:white;margin:0}
-  .sheets{display:block}
-  .sheet{
-    width:210mm;height:297mm;
-    display:grid;gap:0;padding:8mm;page-break-after:always;
-    background:white;
-  }
-  .sheet.cols-2{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
-  .sheet.cols-2.rows-3{grid-template-rows:1fr 1fr 1fr}
-  .sheet.cols-2.rows-4{grid-template-rows:1fr 1fr 1fr 1fr}
-  .sheet > .slot{display:flex;align-items:center;justify-content:center;
-    border:0.4pt dashed #c8c8c8} /* marcas de corte suaves */
-  .sheet > .slot .card{
-    box-shadow:none;border-radius:8px;
-  }
-  /* Tamaño impreso real basado en mm */
-  .size-4 .card{--w:90mm;height:130mm}
-  .size-6 .card{--w:90mm;height:85mm}
-  .size-8 .card{--w:70mm;height:95mm}
-}

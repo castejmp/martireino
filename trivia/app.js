@@ -22,24 +22,38 @@ function shuffle(arr) {
   return a;
 }
 
-/* Elige 5 preguntas: una de cada nivel (1→5, fácil a difícil),
-   tratando de que sean de películas distintas. */
+/* Baraja las opciones de una pregunta y recalcula el índice correcto.
+   Las 'libre' (cualquier opción cuenta) no necesitan ok. */
+function prepararOpciones(p) {
+  if (p.libre) {
+    return { ...p, op: shuffle(p.op), libre: true };
+  }
+  const correctaTexto = p.op[p.ok];
+  const ops = shuffle(p.op);
+  return { ...p, op: ops, ok: ops.indexOf(correctaTexto) };
+}
+
+/* Arma la ronda de 5: una pregunta de cada nivel (1→5, fácil a difícil),
+   de películas distintas, e inyecta 1 (a veces 2) comodines al azar en
+   posiciones después de la primera, para generar reacciones a cámara. */
 function elegirPreguntas() {
   const usadas = new Set();
-  const elegidas = [];
+  const ronda = [];
   for (let nivel = 1; nivel <= N_PREG; nivel++) {
     const pool = shuffle(BANCO.filter(p => p.n === nivel));
-    // preferir una película que no se haya usado todavía
     let elegida = pool.find(p => !usadas.has(p.peli)) || pool[0];
     usadas.add(elegida.peli);
-    elegidas.push(elegida);
+    ronda.push(elegida);
   }
-  // barajar opciones de cada una y guardar índice correcto
-  return elegidas.map(p => {
-    const correctaTexto = p.op[p.ok];
-    const ops = shuffle(p.op);
-    return { peli: p.peli, n: p.n, q: p.q, op: ops, ok: ops.indexOf(correctaTexto) };
-  });
+
+  // ¿cuántos comodines? casi siempre 1, a veces 2
+  const nComod = Math.random() < 0.35 ? 2 : 1;
+  const comodines = shuffle(COMODINES).slice(0, nComod);
+  // posiciones candidatas: cualquiera menos la primera (1..N_PREG-1)
+  const posiciones = shuffle([...Array(N_PREG - 1).keys()].map(i => i + 1)).slice(0, nComod);
+  comodines.forEach((c, i) => { ronda[posiciones[i]] = c; });
+
+  return ronda.map(prepararOpciones);
 }
 
 /* ---------- navegación de pantallas ---------- */
@@ -81,11 +95,19 @@ function pintarPregunta() {
   $("#qPeli").textContent = p.peli;
   $("#qTexto").textContent = p.q;
 
-  const niv = NIVELES[p.n];
-  const estrellas = "★".repeat(niv.estrellas) + "☆".repeat(5 - niv.estrellas);
-  const nivelEl = $("#qNivel");
-  nivelEl.className = "nivel niv-" + p.n;
-  nivelEl.innerHTML = `<span class="stars">${estrellas}</span> ${niv.txt}`;
+  const tagEl = $("#qNivel");
+  if (p.cat) {
+    // comodín: badge de categoría
+    const c = CATS[p.cat];
+    tagEl.className = "nivel comodin cat-" + p.cat;
+    tagEl.innerHTML = `<span class="stars">🎲</span> ${c.emoji} ${c.txt}`;
+  } else {
+    // pregunta de saber: badge de nivel con estrellas
+    const niv = NIVELES[p.n];
+    const estrellas = "★".repeat(niv.estrellas) + "☆".repeat(5 - niv.estrellas);
+    tagEl.className = "nivel niv-" + p.n;
+    tagEl.innerHTML = `<span class="stars">${estrellas}</span> ${niv.txt}`;
+  }
 
   const cont = $("#qOpciones");
   cont.className = "opciones";
@@ -94,7 +116,9 @@ function pintarPregunta() {
   p.op.forEach((texto, i) => {
     const b = document.createElement("button");
     b.className = "opcion";
-    b.innerHTML = `<span class="letra">${letras[i]}</span><span class="txt">${texto}</span><span class="marca">${i === p.ok ? "✓" : "✕"}</span>`;
+    // en libre cualquier opción es válida → siempre ✓; si no, ✓ en la correcta
+    const marca = p.libre ? "✓" : (i === p.ok ? "✓" : "✕");
+    b.innerHTML = `<span class="letra">${letras[i]}</span><span class="txt">${texto}</span><span class="marca">${marca}</span>`;
     b.addEventListener("click", () => responder(i, b));
     cont.appendChild(b);
   });
@@ -111,13 +135,21 @@ function responder(elegido, btn) {
   const p = preguntas[idx];
   const cont = $("#qOpciones");
   cont.classList.add("locked");
-
-  // marcar la correcta y la elegida (si erró)
   const botones = cont.querySelectorAll(".opcion");
-  botones[p.ok].classList.add("ok");
-  if (elegido !== p.ok) botones[elegido].classList.add("bad");
 
-  resultados[idx] = { peli: p.peli, correcta: elegido === p.ok };
+  let correcta;
+  if (p.libre) {
+    // comodín libre: cualquier opción cuenta, figu asegurada
+    botones[elegido].classList.add("ok");
+    correcta = true;
+  } else {
+    // marcar la correcta y la elegida (si erró)
+    botones[p.ok].classList.add("ok");
+    if (elegido !== p.ok) botones[elegido].classList.add("bad");
+    correcta = elegido === p.ok;
+  }
+
+  resultados[idx] = { peli: p.peli, correcta, comodin: !!p.cat };
   pintarDots();
   $("#siguiente").disabled = false;
 }

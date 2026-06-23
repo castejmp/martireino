@@ -58,6 +58,13 @@ html,body{margin:0;padding:0;min-height:100%;
 .nivel.niv-3{background:#e0a52e}
 .nivel.niv-4{background:#e07a2e}
 .nivel.niv-5{background:#d24343}
+
+/* comodines */
+.nivel.comodin{box-shadow:0 4px 14px rgba(0,0,0,.16)}
+.nivel.cat-trampa{background:#7b4fd0}
+.nivel.cat-absurda{background:#1aa5a5}
+.nivel.cat-personal{background:#d50da2}
+.nivel.cat-reto{background:#e0552e}
 .pregunta{font-family:'Cormorant Garamond';font-weight:700;font-size:27px;line-height:1.18;
   color:var(--navy);margin-bottom:22px}
 

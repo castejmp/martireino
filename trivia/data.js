@@ -37,7 +37,7 @@ const BANCO = [
   { peli:"Cars", n:2, q:"¿De qué color es Rayo McQueen?", op:["Rojo","Azul","Verde"], ok:0 },
   { peli:"Cars", n:3, q:"¿Cómo se llama la grúa amiga de McQueen?", op:["Mate","Doc","Luigi"], ok:0 },
   { peli:"Cars", n:4, q:"¿En qué pueblo queda atrapado McQueen?", op:["Radiador Springs","Springfield","Ciudad Gótica"], ok:0 },
-  { peli:"Cars", n:5, q:"¿Qué carrera quiere ganar McQueen?", op:["La Copa Pistón","El Mundial","Las 24 Horas"], ok:0 },
+  { peli:"Cars", n:5, q:"¿Qué número lleva pintado Rayo McQueen?", op:["95","43","1"], ok:0 },
 
   // Monsters Inc
   { peli:"Monsters Inc", n:1, q:"¿Cómo se llama el monstruo grande y peludo azul?", op:["Sulley","Mike","Randall"], ok:0 },
@@ -86,7 +86,7 @@ const BANCO = [
   { peli:"Aladdín", n:2, q:"¿Cómo se llama la princesa?", op:["Jasmín","Aurora","Bella"], ok:0 },
   { peli:"Aladdín", n:3, q:"¿Cuántos deseos concede el genio?", op:["Tres","Uno","Diez"], ok:0 },
   { peli:"Aladdín", n:4, q:"¿Sobre qué vuelan Aladdín y Jasmín?", op:["Una alfombra mágica","Una nube","Un dragón"], ok:0 },
-  { peli:"Aladdín", n:5, q:"¿Cómo se llama el mono de Aladdín?", op:["Abú","Rajá","Iago"], ok:0 },
+  { peli:"Aladdín", n:5, q:"¿Cómo se llama el tigre mascota de Jasmín?", op:["Rajá","Abú","Sahara"], ok:0 },
 
   // Cenicienta
   { peli:"Cenicienta", n:1, q:"¿Qué pierde Cenicienta en el baile?", op:["Un zapato","Un guante","Una corona"], ok:0 },
@@ -100,14 +100,14 @@ const BANCO = [
   { peli:"Coco", n:2, q:"¿Qué festividad mexicana aparece?", op:["El Día de los Muertos","Navidad","Halloween"], ok:0 },
   { peli:"Coco", n:3, q:"¿Qué le encanta hacer a Miguel?", op:["Tocar música","Cocinar","Pintar"], ok:0 },
   { peli:"Coco", n:4, q:"¿Cuál es la canción más famosa?", op:["Recuérdame","Libre soy","Bajo el mar"], ok:0 },
-  { peli:"Coco", n:5, q:"¿Qué animal es Dante?", op:["Un perro","Un gato","Un gallo"], ok:0 },
+  { peli:"Coco", n:5, q:"¿Cómo se llama el ídolo de Miguel que resulta ser el villano?", op:["Ernesto de la Cruz","Héctor Rivera","Juan Ortodoncia"], ok:0 },
 
   // Dumbo
   { peli:"Dumbo", n:1, q:"¿Qué animal es Dumbo?", op:["Un elefante","Un ratón","Un oso"], ok:0 },
   { peli:"Dumbo", n:2, q:"¿Qué tiene de especial Dumbo?", op:["Sus grandes orejas","Su trompa larga","Su color"], ok:0 },
   { peli:"Dumbo", n:3, q:"¿Para qué le sirven las orejas a Dumbo?", op:["Para volar","Para nadar","Para escuchar lejos"], ok:0 },
   { peli:"Dumbo", n:4, q:"¿Dónde trabaja Dumbo?", op:["En un circo","En un zoológico","En una granja"], ok:0 },
-  { peli:"Dumbo", n:5, q:"¿Qué animal es su mejor amigo?", op:["Un ratón","Un león","Un mono"], ok:0 },
+  { peli:"Dumbo", n:5, q:"¿Qué aves convencen a Dumbo de que puede volar?", op:["Los cuervos","Las palomas","Los flamencos"], ok:0 },
 
   // 101 Dálmatas
   { peli:"101 Dálmatas", n:1, q:"¿Qué raza de perros son los protagonistas?", op:["Dálmatas","Labradores","Chihuahuas"], ok:0 },
@@ -152,4 +152,58 @@ const NIVELES = {
   3: { txt:"Media",       estrellas:3 },
   4: { txt:"Difícil",     estrellas:4 },
   5: { txt:"Muy difícil", estrellas:5 },
+};
+
+/* ============================================================
+   COMODINES · cartas locas para el reel
+   Se inyectan al azar en la ronda (1, a veces 2 por participante).
+   Pensadas para incomodar, divertir, asustar o hacer dudar —
+   no para medir quién sabe más.
+   cat: trampa | absurda | personal | reto
+   - trampa: tiene respuesta real pero contraintuitiva (puede errar)
+   - libre:true → cualquier opción cuenta como correcta (figu asegurada,
+     el valor está en la reacción frente a cámara)
+   ============================================================ */
+const COMODINES = [
+  // ---- TRAMPAS (respuesta real, pero te hacen dudar) ----
+  { cat:"trampa", peli:"Blancanieves", q:"¿Cuál de estos NO es uno de los siete enanitos?", op:["Gruñón","Feliz","Chistoso"], ok:2 },
+  { cat:"trampa", peli:"Coco", q:"En la película, ¿quién es realmente 'Coco'?", op:["La bisabuela de Miguel","El perro Dante","La guitarra"], ok:0 },
+  { cat:"trampa", peli:"Disney/Pixar", q:"¿Cuál de estas NO es una película de Pixar?", op:["La Sirenita","Coco","Cars"], ok:0 },
+  { cat:"trampa", peli:"Princesas", q:"¿Cuál de estas princesas es la MÁS JOVEN?", op:["Blancanieves (14)","Jasmín (15)","Ariel (16)"], ok:0 },
+  { cat:"trampa", peli:"Aladdín", q:"¿Cuántas cosas NO te puede conceder el Genio, aunque se lo ruegues?", op:["3","1","Ninguna, hace todo"], ok:0 },
+  { cat:"trampa", peli:"Rey León", q:"Mufasa es, de Simba, su...", op:["Papá","Abuelo","Tío"], ok:0 },
+  { cat:"trampa", peli:"101 Dálmatas", q:"Tenés 3 segundos: nombrá un cachorro de los 101 dálmatas.", op:["Lucky","Spot","Firulais"], ok:0 },
+  { cat:"trampa", peli:"Varias", q:"¿Cuál de estos personajes MUERE en su película?", op:["Mufasa","Aladdín","Hércules"], ok:0 },
+  { cat:"trampa", peli:"La Sirenita", q:"Úrsula, la bruja del mar, es mitad mujer y mitad...", op:["Pulpo","Tiburón","Serpiente"], ok:0 },
+  { cat:"trampa", peli:"Peter Pan", q:"¿Qué parte del cuerpo perdió el Capitán Garfio?", op:["La mano","Una pierna","Un ojo"], ok:0 },
+
+  // ---- ABSURDAS (no hay respuesta real, ganás igual) ----
+  { cat:"absurda", peli:"Lilo & Stitch", q:"Si Stitch fuera un electrodoméstico, ¿cuál sería?", op:["Una licuadora con patas","Un microondas","Un ventilador roto"], libre:true },
+  { cat:"absurda", peli:"Disney", q:"¿Quién es más alto, Mickey Mouse o Stitch?", op:["Mickey","Stitch","Miden exactamente igual"], libre:true },
+  { cat:"absurda", peli:"Cars", q:"Si Rayo McQueen choca con Mate, ¿quién paga el seguro?", op:["McQueen","Mate","La mesa de al lado"], libre:true },
+  { cat:"absurda", peli:"Ratatouille", q:"¿Comerías un plato cocinado por Remy, la rata?", op:["Sí, sin dudar","Solo si no miro","Ni muerto"], libre:true },
+  { cat:"absurda", peli:"Varias", q:"En una pelea sin reglas: ¿Simba adulto o Stitch?", op:["Simba","Stitch","Stitch porque es alien"], libre:true },
+
+  // ---- PERSONALES (a cámara, te exponen) ----
+  { cat:"personal", peli:"Rey León", q:"Sé honesto a cámara: ¿lloraste con la muerte de Mufasa?", op:["Sí, obvio","No (mentira)","Todavía lloro"], libre:true },
+  { cat:"personal", peli:"Disney", q:"Mirá a cámara y confesá: ¿quién fue tu Disney crush?", op:["Lo digo sin vergüenza","Me pongo rojo","Paso a la siguiente"], libre:true },
+  { cat:"personal", peli:"Villanos", q:"¿Con cuál de estos villanos te irías de joda?", op:["Úrsula","Cruella","Capitán Garfio"], libre:true },
+  { cat:"personal", peli:"Maléfica", q:"¿Quién es más villano: tu ex o Maléfica?", op:["Mi ex, lejos","Maléfica","Empatan"], libre:true },
+  { cat:"personal", peli:"Disney", q:"Si tu vida fuera una peli Disney, ¿cuál sería?", op:["Enredados","El Rey León","Coco"], libre:true },
+  { cat:"personal", peli:"Aladdín", q:"El Genio te da 3 deseos. El primero que pedís es...", op:["Plata","Amor","Más deseos (tramposo)"], libre:true },
+
+  // ---- RETOS (performance a cámara) ----
+  { cat:"reto", peli:"Rey León", q:"Imitá el rugido de Simba ahora mismo, mirando a cámara.", op:["Lo hago full","Versión tímida","Me niego rotundamente"], libre:true },
+  { cat:"reto", peli:"Aladdín", q:"Cantá un pedazo de 'Un mundo ideal'. Ya, sin vueltas.", op:["La rompo cantando","Solo el estribillo","Ni en pedo"], libre:true },
+  { cat:"reto", peli:"Coco", q:"Cantá 'Recuérdame' como si fuera tu última canción.", op:["Emociono a todos","Bajito","Que cante otro"], libre:true },
+  { cat:"reto", peli:"Moana", q:"Bailá 3 segundos como si estuvieras en la isla de Moana.", op:["Me suelto entero","Solo los hombros","Me quedo quieto"], libre:true },
+  { cat:"reto", peli:"Frozen", q:"Cantá 'Libre soy' en la nota más alta que puedas.", op:["Rompo vidrios","Medio tono nomás","Me rajo corriendo"], libre:true },
+];
+
+/* Etiquetas visuales de cada categoría de comodín */
+const CATS = {
+  trampa:   { txt:"Trampa",   emoji:"🤔" },
+  absurda:  { txt:"Absurda",  emoji:"🤪" },
+  personal: { txt:"A cámara", emoji:"🎬" },
+  reto:     { txt:"Reto",     emoji:"🔥" },
 };

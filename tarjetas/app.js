@@ -151,16 +151,10 @@ function cardFront(q) {
   const m = mesaMap[q.mesa] || { nombre: `Mesa ${q.mesa}`, rareza: "comun" };
   const c = el("div", { class: "card front" });
   c.innerHTML = `
-    <div class="top-half">
-      <img class="lo" src="../assets/logo.png" alt="Martina Fifteen">
-      <div class="nombre">${escapeHTML(q.name)}</div>
-      <div class="mesa">Mesa ${escapeHTML(m.nombre)}</div>
-      <div class="qrwrap"><img src="${q.dataUrl}" alt="QR ${escapeHTML(q.name)}"></div>
-    </div>
-    <div class="divider"></div>
-    <div class="bot-half">
-      <img class="pulsera-img" src="../assets/androled.jpeg" alt="Info pulsera">
-    </div>`;
+    <img class="lo" src="../assets/logo.png" alt="Martina Fifteen">
+    <div class="nombre">${escapeHTML(q.name)}</div>
+    <div class="mesa">Mesa ${escapeHTML(m.nombre)}</div>
+    <div class="qrwrap"><img src="${q.dataUrl}" alt="QR"></div>`;
   return c;
 }
 function escapeHTML(s) {

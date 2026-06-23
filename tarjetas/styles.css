@@ -62,40 +62,28 @@ textarea:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(213,13,162,
   font-family:'Mulish',sans-serif}
 
 .card.front{
-  display:flex;flex-direction:column;align-items:stretch;text-align:center;padding:0;
-  background:#fff}
-
-/* ---- top half: QR ---- */
-.card.front .top-half{display:flex;flex-direction:column;align-items:center;
-  padding:14px 16px 10px;flex:1 1 auto;
+  display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 18px 14px;
   background:radial-gradient(circle at 50% 0%,#ffe9f4,#fff 55%)}
-.card.front .lo{width:40%;max-height:48px;object-fit:contain;flex:0 0 auto}
-.card.front .nombre{margin:8px 0 0;font-family:'Cormorant Garamond';font-weight:700;font-size:22px;line-height:1.02;
+.card.front .lo{width:46%;max-height:64px;object-fit:contain;flex:0 0 auto}
+.card.front .nombre{margin:14px 0 0;font-family:'Cormorant Garamond';font-weight:700;font-size:26px;line-height:1.02;
   color:var(--navy);letter-spacing:.01em;word-break:break-word}
-.card.front .mesa{margin:5px 0 0;font-family:'Chewy',cursive;font-size:18px;color:var(--magenta);line-height:1;
+.card.front .mesa{margin:8px 0 0;font-family:'Chewy',cursive;font-size:22px;color:var(--magenta);line-height:1;
   letter-spacing:.02em;text-transform:uppercase}
-.card.front .qrwrap{margin:8px 0 0;padding:6px;background:#fff;border:1px solid #f0e9d4;border-radius:8px;
+.card.front .qrwrap{margin:auto 0;padding:8px;background:#fff;border:1px solid #f0e9d4;border-radius:10px;
   box-shadow:0 2px 0 rgba(0,0,0,.04)}
-.card.front .qrwrap img{display:block;width:120px;height:120px;image-rendering:pixelated}
-
-/* ---- divider ---- */
-.card.front .divider{height:0;border-top:1.5px dashed #d0cbe0;margin:0 14px;flex:0 0 auto}
-
-/* ---- bottom half: pulsera image ---- */
-.card.front .bot-half{padding:6px 10px 8px;flex:0 0 auto;display:flex;align-items:center;justify-content:center}
-.card.front .pulsera-img{width:80%;height:auto;object-fit:contain;display:block}
+.card.front .qrwrap img{display:block;width:160px;height:160px;image-rendering:pixelated}
 
 /* tamaños distintos según "per page" */
-.size-6 .card{--w:300px}
-.size-6 .card.front .nombre{font-size:18px}
-.size-6 .card.front .mesa{font-size:15px}
-.size-6 .card.front .qrwrap img{width:90px;height:90px}
+.size-6 .card{--w:340px}
+.size-6 .card.front .nombre{font-size:22px}
+.size-6 .card.front .mesa{font-size:18px}
+.size-6 .card.front .qrwrap img{width:130px;height:130px}
 
-.size-8 .card{--w:240px}
-.size-8 .card.front .lo{max-height:36px}
-.size-8 .card.front .nombre{font-size:17px;margin-top:6px}
-.size-8 .card.front .mesa{font-size:14px}
-.size-8 .card.front .qrwrap img{width:80px;height:80px}
+.size-8 .card{--w:265px}
+.size-8 .card.front .lo{max-height:48px}
+.size-8 .card.front .nombre{font-size:20px;margin-top:10px}
+.size-8 .card.front .mesa{font-size:16px}
+.size-8 .card.front .qrwrap img{width:130px;height:130px}
 
 /* ============= SHEET (print) ============= */
 .sheets{display:none}

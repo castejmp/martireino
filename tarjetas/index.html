@@ -18,7 +18,7 @@
     </div>
     <div>
       <h1>Generador de tarjetas</h1>
-      <p class="sub">Procesá los 200 QR del Drive y generá las tarjetas para imprenta · doble cara, listas para cortar.</p>
+      <p class="sub">Procesá los QR del Drive y generá las tarjetas como PNG individuales.</p>
     </div>
   </header>
 
@@ -42,30 +42,24 @@
 
   <section class="step">
     <h2><span class="n">3</span> Vista previa</h2>
-    <p class="hint">Así sale la primera tarjeta. Si todo está bien, generá el PDF.</p>
+    <p class="hint">Así sale la primera tarjeta. Si todo está bien, generá los PNG.</p>
     <div id="preview" class="preview"></div>
   </section>
 
   <section class="step">
-    <h2><span class="n">4</span> Generar PDF</h2>
+    <h2><span class="n">4</span> Generar PNG</h2>
     <div class="actions">
-      <label>Tarjetas por hoja
-        <select id="per">
-          <option value="4" selected>4 (90×130mm · recomendado)</option>
-          <option value="6">6 (90×85mm)</option>
-          <option value="8">8 (70×95mm)</option>
-        </select>
-      </label>
-      <button id="go" class="btn primary">📄 Generar para imprenta</button>
+      <button id="go" class="btn primary">📦 Generar ZIP de tarjetas</button>
     </div>
     <p class="hint">
-      El PDF abre el diálogo de impresión: elegí <strong>Guardar como PDF</strong> (Cmd/Ctrl+P) o mandalo directo a la impresora.
+      Genera un PNG de 1086×1448px por cada invitado, nombrado <code>Película-NOMBRE_APELLIDO.png</code>, todo en un ZIP.
     </p>
+    <div id="progress" class="progress"></div>
   </section>
 </div>
 
-<div id="sheets" class="sheets"></div>
-
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

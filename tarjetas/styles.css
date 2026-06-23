@@ -84,38 +84,21 @@ textarea:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(213,13,162,
 /* ---- divider ---- */
 .card.front .divider{height:0;border-top:1.5px dashed #d0cbe0;margin:0 14px;flex:0 0 auto}
 
-/* ---- bottom half: pulsera ---- */
-.card.front .bot-half{padding:10px 16px 12px;flex:0 0 auto;text-align:left}
-.card.front .pulsera-title{font-size:13px;font-weight:900;color:var(--ink);text-align:center;margin-bottom:8px;line-height:1.2}
-.card.front .pulsera-title b{font-size:18px;display:block;letter-spacing:.04em}
-.card.front .pulsera-rows{display:flex;flex-direction:column;gap:5px}
-.card.front .prow{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:800;
-  text-transform:uppercase;letter-spacing:.04em;color:var(--ink);line-height:1.25}
-.card.front .pico{width:22px;height:22px;flex:0 0 22px;color:var(--ink)}
-.card.front .pico svg{width:100%;height:100%}
-.card.front .androled{margin-top:8px;text-align:center;font-size:10px;font-weight:900;
-  letter-spacing:.08em;color:var(--muted)}
-.card.front .androled span{font-weight:600;letter-spacing:.06em;font-size:8px}
+/* ---- bottom half: pulsera image ---- */
+.card.front .bot-half{padding:6px 10px 8px;flex:0 0 auto;display:flex;align-items:center;justify-content:center}
+.card.front .pulsera-img{width:100%;height:auto;object-fit:contain;display:block}
 
 /* tamaños distintos según "per page" */
 .size-6 .card{--w:340px;--h:325px}
 .size-6 .card.front .nombre{font-size:18px}
 .size-6 .card.front .mesa{font-size:15px}
 .size-6 .card.front .qrwrap img{width:90px;height:90px}
-.size-6 .card.front .bot-half{padding:6px 12px 8px}
-.size-6 .card.front .pulsera-title b{font-size:14px}
-.size-6 .card.front .prow{font-size:8px}
-.size-6 .card.front .pico{width:18px;height:18px;flex:0 0 18px}
 
 .size-8 .card{--w:265px;--h:357px}
 .size-8 .card.front .lo{max-height:36px}
 .size-8 .card.front .nombre{font-size:17px;margin-top:6px}
 .size-8 .card.front .mesa{font-size:14px}
 .size-8 .card.front .qrwrap img{width:90px;height:90px}
-.size-8 .card.front .bot-half{padding:6px 10px 8px}
-.size-8 .card.front .pulsera-title b{font-size:13px}
-.size-8 .card.front .prow{font-size:8px;gap:6px}
-.size-8 .card.front .pico{width:16px;height:16px;flex:0 0 16px}
 
 /* ============= SHEET (print) ============= */
 .sheets{display:none}

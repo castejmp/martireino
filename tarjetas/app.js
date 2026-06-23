@@ -173,21 +173,20 @@ function pngName(q) {
   return `${pelicula}-${q.rawName}.png`;
 }
 
+const PREVIEW_W = 340;
+const SCALE = PNG_W / PREVIEW_W;
+
 /* ---------------- render card to PNG blob at 1086×1448 ---------------- */
 async function renderCard(q) {
   const card = cardFront(q);
-  card.style.width = PNG_W + "px";
-  card.style.height = PNG_H + "px";
   const sandbox = el("div", {
-    style: `position:fixed;left:-9999px;top:0;width:${PNG_W}px;height:${PNG_H}px`
+    style: `position:fixed;left:-9999px;top:0;width:${PREVIEW_W}px`
   });
   document.body.appendChild(sandbox);
   sandbox.appendChild(card);
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
   const canvas = await html2canvas(card, {
-    width: PNG_W,
-    height: PNG_H,
-    scale: 1,
+    scale: SCALE,
     useCORS: true,
     backgroundColor: "#ffffff"
   });

@@ -43,16 +43,6 @@ const DEFAULT_MAP = `1: Enredados | dorada
 19: La Sirenita | rara
 20: Lilo & Stitch | comun`;
 
-const FRAMES = {
-  comun:  "../assets/frames/comun.jpg",
-  rara:   "../assets/frames/especial.jpg",
-  epica:  "../assets/frames/legendaria.jpg",
-  dorada: "../assets/frames/oro.jpg",
-};
-
-/* Carta real de cada mesa: si existe assets/cartas/MM.jpg la usamos
-   como dorso completo. Si no, cae al marco según rareza. */
-const CARTA = mesa => `../assets/cartas/${String(mesa).padStart(2, "0")}.jpg`;
 
 /* ---------------- state ---------------- */
 let qrs = [];     // [{ filename, name, mesa, dataUrl }]
@@ -169,23 +159,6 @@ function cardFront(q) {
     Tu pulsera es tu cuenta · no hace falta instalar nada.</div>`;
   return c;
 }
-function cardBack(q) {
-  const m = mesaMap[q.mesa] || { nombre: `Mesa ${q.mesa}`, rareza: "comun" };
-  const c = el("div", { class: `card back r-${m.rareza}` });
-  /* Si hay carta real de esa mesa, la usamos como dorso completo
-     (cubre todo). El onerror cae al fallback marco+nombre. */
-  c.innerHTML = `
-    <img class="carta" src="${CARTA(q.mesa)}" alt=""
-      onload="this.closest('.card').classList.add('hascarta')"
-      onerror="this.remove()">
-    <img class="frame" src="${FRAMES[m.rareza]}" alt="">
-    <div class="overlay">
-      <div class="kicker">Tu mesa</div>
-      <div class="pelicula">${escapeHTML(m.nombre)}</div>
-    </div>
-    <div class="reino">✦ Reino de Marti ✦</div>`;
-  return c;
-}
 function escapeHTML(s) {
   return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
@@ -200,7 +173,6 @@ function paintPreview() {
     return;
   }
   const q = qrs[0];
-  p.appendChild(cardBack(q));
   p.appendChild(cardFront(q));
 }
 
@@ -215,28 +187,13 @@ function buildSheets() {
 
   for (let i = 0; i < qrs.length; i += per) {
     const batch = qrs.slice(i, i + per);
-    // FRENTE: carta de la película de cada mesa
-    const front = el("div", { class: cls });
+    const page = el("div", { class: cls });
     batch.forEach(q => {
       const slot = el("div", { class: "slot" });
-      slot.appendChild(cardBack(q));
-      front.appendChild(slot);
+      slot.appendChild(cardFront(q));
+      page.appendChild(slot);
     });
-    sheetsRoot.appendChild(front);
-    // DORSO: QR + nombre (flip por borde largo: invertir columnas)
-    const back = el("div", { class: cls });
-    for (let r = 0; r < rows; r++) {
-      const row = batch.slice(r * cols, r * cols + cols);
-      for (let k = row.length - 1; k >= 0; k--) {
-        const slot = el("div", { class: "slot" });
-        slot.appendChild(cardFront(row[k]));
-        back.appendChild(slot);
-      }
-      for (let k = row.length; k < cols; k++) {
-        back.appendChild(el("div", { class: "slot" }));
-      }
-    }
-    sheetsRoot.appendChild(back);
+    sheetsRoot.appendChild(page);
   }
 }
 
@@ -249,15 +206,13 @@ async function buildZip() {
   document.body.appendChild(sandbox);
   for (let i = 0; i < qrs.length; i++) {
     const q = qrs[i];
-    for (const lado of ["front", "back"]) {
-      sandbox.innerHTML = "";
-      const card = lado === "front" ? cardBack(q) : cardFront(q);
-      sandbox.appendChild(card);
-      await new Promise(r => requestAnimationFrame(r));
-      const blob = await renderToBlob(card);
-      const slug = q.name.replace(/\s+/g, "_") + "_mesa" + q.mesa;
-      zip.file(`${String(i + 1).padStart(3, "0")}_${slug}_${lado}.png`, blob);
-    }
+    sandbox.innerHTML = "";
+    const card = cardFront(q);
+    sandbox.appendChild(card);
+    await new Promise(r => requestAnimationFrame(r));
+    const blob = await renderToBlob(card);
+    const slug = q.name.replace(/\s+/g, "_") + "_mesa" + q.mesa;
+    zip.file(`${String(i + 1).padStart(3, "0")}_${slug}.png`, blob);
   }
   sandbox.remove();
   const out = await zip.generateAsync({ type: "blob" });

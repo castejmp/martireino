@@ -201,69 +201,6 @@ function buildSheets() {
   }
 }
 
-/* ---------------- ZIP de PNGs individuales ----------------
-   Render front + back de cada tarjeta a canvas y empaqueta. */
-async function buildZip() {
-  if (!window.JSZip) return alert("JSZip no cargó");
-  const zip = new JSZip();
-  const sandbox = el("div", { style: "position:fixed;left:-3000px;top:0" });
-  document.body.appendChild(sandbox);
-  for (let i = 0; i < qrs.length; i++) {
-    const q = qrs[i];
-    sandbox.innerHTML = "";
-    const card = cardFront(q);
-    sandbox.appendChild(card);
-    await new Promise(r => requestAnimationFrame(r));
-    const blob = await renderToBlob(card);
-    const slug = q.name.replace(/\s+/g, "_") + "_mesa" + q.mesa;
-    zip.file(`${String(i + 1).padStart(3, "0")}_${slug}.png`, blob);
-  }
-  sandbox.remove();
-  const out = await zip.generateAsync({ type: "blob" });
-  downloadBlob(out, "tarjetas_marti_xv.zip");
-}
-
-async function renderToBlob(node) {
-  // Renderiza el nodo a canvas via SVG foreignObject (sin librerías externas).
-  const rect = node.getBoundingClientRect();
-  const w = Math.ceil(rect.width), h = Math.ceil(rect.height);
-  const clone = node.cloneNode(true);
-  await inlineImages(clone);
-  const xhtml = new XMLSerializer().serializeToString(clone);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-    <foreignObject width="100%" height="100%">
-      <div xmlns="http://www.w3.org/1999/xhtml" style="width:${w}px;height:${h}px">${xhtml}</div>
-    </foreignObject></svg>`;
-  const url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-  const img = new Image();
-  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
-  const cv = document.createElement("canvas");
-  cv.width = w * 2; cv.height = h * 2;
-  const ctx = cv.getContext("2d");
-  ctx.scale(2, 2);
-  ctx.drawImage(img, 0, 0, w, h);
-  return await new Promise(res => cv.toBlob(res, "image/png"));
-}
-async function inlineImages(root) {
-  const imgs = root.querySelectorAll("img");
-  await Promise.all([...imgs].map(async img => {
-    if (img.src.startsWith("data:")) return;
-    try {
-      const r = await fetch(img.src);
-      const b = await r.blob();
-      const d = await new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(b); });
-      img.src = d;
-    } catch (e) { /* deja el src */ }
-  }));
-}
-function downloadBlob(blob, name) {
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-}
-
 /* ---------------- wiring ---------------- */
 function init() {
   $("#map").value = DEFAULT_MAP;
@@ -291,16 +228,7 @@ function init() {
   $("#go").addEventListener("click", () => {
     if (!qrs.length) return alert("Cargá los QR primero");
     buildSheets();
-    // Esperar un frame para que el browser renderice antes del print
     requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
-  });
-  $("#goSingles").addEventListener("click", async () => {
-    if (!qrs.length) return alert("Cargá los QR primero");
-    const btn = $("#goSingles");
-    btn.disabled = true; const txt = btn.textContent;
-    btn.textContent = "Generando ZIP…";
-    try { await buildZip(); } catch (e) { alert("Error: " + e.message); }
-    btn.disabled = false; btn.textContent = txt;
   });
   paintPreview();
 }

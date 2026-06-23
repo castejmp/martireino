@@ -56,9 +56,8 @@ textarea:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(213,13,162,
 
 /* ============= CARD ============= */
 .card{
-  /* default 90mm × 130mm @ 96dpi: 340 × 491px */
-  --w:340px; --h:491px;
-  width:var(--w);height:var(--h);background:#fff;border-radius:10px;
+  --w:340px;
+  width:var(--w);background:#fff;border-radius:10px;
   position:relative;overflow:hidden;color:var(--ink);
   font-family:'Mulish',sans-serif}
 
@@ -75,7 +74,7 @@ textarea:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(213,13,162,
   color:var(--navy);letter-spacing:.01em;word-break:break-word}
 .card.front .mesa{margin:5px 0 0;font-family:'Chewy',cursive;font-size:18px;color:var(--magenta);line-height:1;
   letter-spacing:.02em;text-transform:uppercase}
-.card.front .qrwrap{margin:auto 0;padding:6px;background:#fff;border:1px solid #f0e9d4;border-radius:8px;
+.card.front .qrwrap{margin:8px 0 0;padding:6px;background:#fff;border:1px solid #f0e9d4;border-radius:8px;
   box-shadow:0 2px 0 rgba(0,0,0,.04)}
 .card.front .qrwrap img{display:block;width:120px;height:120px;image-rendering:pixelated}
 
@@ -87,16 +86,16 @@ textarea:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(213,13,162,
 .card.front .pulsera-img{width:80%;height:auto;object-fit:contain;display:block}
 
 /* tamaños distintos según "per page" */
-.size-6 .card{--w:340px;--h:325px}
+.size-6 .card{--w:300px}
 .size-6 .card.front .nombre{font-size:18px}
 .size-6 .card.front .mesa{font-size:15px}
 .size-6 .card.front .qrwrap img{width:90px;height:90px}
 
-.size-8 .card{--w:265px;--h:357px}
+.size-8 .card{--w:240px}
 .size-8 .card.front .lo{max-height:36px}
 .size-8 .card.front .nombre{font-size:17px;margin-top:6px}
 .size-8 .card.front .mesa{font-size:14px}
-.size-8 .card.front .qrwrap img{width:90px;height:90px}
+.size-8 .card.front .qrwrap img{width:80px;height:80px}
 
 /* ============= SHEET (print) ============= */
 .sheets{display:none}
@@ -121,7 +120,7 @@ textarea:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(213,13,162,
     box-shadow:none;border-radius:8px;
   }
   /* Tamaño impreso real basado en mm */
-  .size-4 .card{--w:90mm;--h:130mm}
-  .size-6 .card{--w:90mm;--h:85mm}
-  .size-8 .card{--w:70mm;--h:95mm}
+  .size-4 .card{--w:90mm;height:130mm}
+  .size-6 .card{--w:90mm;height:85mm}
+  .size-8 .card{--w:70mm;height:95mm}
 }

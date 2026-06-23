@@ -161,7 +161,7 @@ function cardFront(q) {
     </div>
     <div class="divider"></div>
     <div class="bot-half">
-      <img class="pulsera-img" src="../assets/pulsera-info.png" alt="Info pulsera">
+      <img class="pulsera-img" src="../assets/androled.jpeg" alt="Info pulsera">
     </div>`;
   return c;
 }

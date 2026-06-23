@@ -23,13 +23,13 @@ const el = (tag, attrs = {}, html = "") => {
    para cambiar nombres o números. Las rarezas son las que ya usa la app
    del juego (común/especial/legendaria/dorada). */
 const DEFAULT_MAP = `1: Enredados | dorada
-2: Alicia en el País de las Maravillas | rara
+2: Moana | comun
 3: Ratatouille | comun
 4: Rey León | comun
 5: Cars | comun
 6: Monsters Inc | comun
 7: La Princesa y el Sapo | comun
-8: La Dama y el Vagabundo | comun
+8: Pocahontas | comun
 9: Peter Pan | rara
 10: Blancanieves | rara
 11: Winnie the Pooh | comun

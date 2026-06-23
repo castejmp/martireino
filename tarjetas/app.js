@@ -22,24 +22,26 @@ const el = (tag, attrs = {}, html = "") => {
    El usuario lo edita en vivo en el textarea, así no hace falta deploy
    para cambiar nombres o números. Las rarezas son las que ya usa la app
    del juego (común/especial/legendaria/dorada). */
-const DEFAULT_MAP = `1: Rey León | comun
-2: La Sirenita | comun
-3: Moana | comun
-4: Cars | comun
-5: Ratatouille | comun
-6: La Princesa y el Sapo | comun
-7: Pocahontas | comun
-8: Maléfica | epica
-9: Coco | epica
-10: Winnie the Pooh | comun
-11: Aladdín | comun
-12: Lilo y Stitch | rara
+const DEFAULT_MAP = `1: Enredados | dorada
+2: Alicia en el País de las Maravillas | rara
+3: Ratatouille | comun
+4: Rey León | comun
+5: Cars | comun
+6: Monsters Inc | comun
+7: La Princesa y el Sapo | comun
+8: La Dama y el Vagabundo | comun
+9: Peter Pan | rara
+10: Blancanieves | rara
+11: Winnie the Pooh | comun
+12: Aladdín | comun
 13: Cenicienta | rara
-14: Blanca Nieves | rara
-15: Dumbo | rara
+14: Coco | epica
+15: Dumbo | comun
 16: 101 Dálmatas | rara
-17: Peter Pan | rara
-18: Enredados | dorada`;
+17: Maléfica | epica
+18: La Bella y la Bestia | rara
+19: La Sirenita | rara
+20: Lilo & Stitch | comun`;
 
 const FRAMES = {
   comun:  "../assets/frames/comun.jpg",
@@ -110,20 +112,43 @@ async function ingest(fileList) {
 function paintCounts() {
   const c = $("#counts");
   if (!qrs.length && !bad.length) { c.textContent = ""; return; }
-  const mesas = new Set(qrs.map(q => q.mesa));
-  const sinMapeo = qrs.filter(q => !mesaMap[q.mesa]).map(q => q.mesa);
-  const sinMapeoSet = new Set(sinMapeo);
-  c.className = "counts" + (qrs.length && !bad.length && !sinMapeoSet.size ? " ok" : "");
-  c.innerHTML = `✓ ${qrs.length} QR cargados · ${mesas.size} mesas distintas`;
+
+  // conteo por mesa
+  const porMesa = {};
+  qrs.forEach(q => { porMesa[q.mesa] = (porMesa[q.mesa] || 0) + 1; });
+  const mesas = Object.keys(porMesa).map(n => +n).sort((a, b) => a - b);
+  const sinMapeoSet = new Set(qrs.filter(q => !mesaMap[q.mesa]).map(q => q.mesa));
+
+  // duplicados (mismo nombre en mesas distintas o repetido)
+  const byName = {};
+  qrs.forEach(q => { (byName[q.name] = byName[q.name] || []).push(q); });
+  const dupes = Object.entries(byName).filter(([, arr]) => arr.length > 1);
+
+  c.className = "counts" + (qrs.length && !bad.length && !sinMapeoSet.size && !dupes.length ? " ok" : "");
+  c.innerHTML = `✓ ${qrs.length} QR cargados · ${mesas.length} mesas distintas` +
+    `<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:700;color:var(--magenta)">Ver conteo por mesa</summary>` +
+    `<table style="margin-top:6px;font-size:12.5px;border-collapse:collapse">` +
+    mesas.map(n => {
+      const nm = mesaMap[n] ? mesaMap[n].nombre : `(sin nombre)`;
+      return `<tr><td style="padding:2px 12px 2px 0;color:var(--muted)">Mesa ${n}</td>
+        <td style="padding:2px 12px 2px 0">${nm}</td>
+        <td style="padding:2px 0;font-weight:800">${porMesa[n]}</td></tr>`;
+    }).join("") + `</table></details>`;
 
   const e = $("#errors"); e.innerHTML = "";
   if (bad.length) {
-    e.innerHTML += `<div>⚠ ${bad.length} archivos descartados (nombre inválido):</div>
+    e.innerHTML += `<div>⚠ ${bad.length} archivos con nombre inválido:</div>
       <ul>${bad.slice(0, 6).map(b => `<li><code>${b.filename}</code></li>`).join("")}
       ${bad.length > 6 ? `<li>… y ${bad.length - 6} más</li>` : ""}</ul>`;
   }
   if (sinMapeoSet.size) {
     e.innerHTML += `<div>⚠ Mesas sin nombre en la tabla: ${[...sinMapeoSet].sort((a, b) => a - b).join(", ")}</div>`;
+  }
+  if (dupes.length) {
+    e.innerHTML += `<div>⚠ Nombres duplicados en distintos QR:</div><ul>` +
+      dupes.slice(0, 6).map(([nm, arr]) =>
+        `<li><b>${nm}</b> en mesa(s) ${[...new Set(arr.map(x => x.mesa))].join(", ")} (${arr.length} QR)</li>`
+      ).join("") + `</ul>`;
   }
 }
 

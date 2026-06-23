@@ -57,7 +57,7 @@ textarea:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(213,13,162,
 /* ============= CARD ============= */
 .card{
   --w:340px;
-  width:var(--w);background:#fff;border-radius:10px;
+  width:var(--w);aspect-ratio:1086/1448;background:#fff;border-radius:10px;
   position:relative;overflow:hidden;color:var(--ink);
   font-family:'Mulish',sans-serif}
 

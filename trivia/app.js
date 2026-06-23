@@ -22,27 +22,23 @@ function shuffle(arr) {
   return a;
 }
 
-/* Elige 5 preguntas tratando de que sean de películas distintas */
+/* Elige 5 preguntas: una de cada nivel (1→5, fácil a difícil),
+   tratando de que sean de películas distintas. */
 function elegirPreguntas() {
-  const mezcladas = shuffle(BANCO);
   const usadas = new Set();
   const elegidas = [];
-  for (const p of mezcladas) {
-    if (elegidas.length >= N_PREG) break;
-    if (usadas.has(p.peli)) continue;
-    usadas.add(p.peli);
-    elegidas.push(p);
-  }
-  // si por algún motivo no llegamos a 5, completar con cualquiera
-  for (const p of mezcladas) {
-    if (elegidas.length >= N_PREG) break;
-    if (!elegidas.includes(p)) elegidas.push(p);
+  for (let nivel = 1; nivel <= N_PREG; nivel++) {
+    const pool = shuffle(BANCO.filter(p => p.n === nivel));
+    // preferir una película que no se haya usado todavía
+    let elegida = pool.find(p => !usadas.has(p.peli)) || pool[0];
+    usadas.add(elegida.peli);
+    elegidas.push(elegida);
   }
   // barajar opciones de cada una y guardar índice correcto
-  return elegidas.slice(0, N_PREG).map(p => {
+  return elegidas.map(p => {
     const correctaTexto = p.op[p.ok];
     const ops = shuffle(p.op);
-    return { peli: p.peli, q: p.q, op: ops, ok: ops.indexOf(correctaTexto) };
+    return { peli: p.peli, n: p.n, q: p.q, op: ops, ok: ops.indexOf(correctaTexto) };
   });
 }
 
@@ -84,6 +80,12 @@ function pintarPregunta() {
   $("#qNum").textContent = idx + 1;
   $("#qPeli").textContent = p.peli;
   $("#qTexto").textContent = p.q;
+
+  const niv = NIVELES[p.n];
+  const estrellas = "★".repeat(niv.estrellas) + "☆".repeat(5 - niv.estrellas);
+  const nivelEl = $("#qNivel");
+  nivelEl.className = "nivel niv-" + p.n;
+  nivelEl.innerHTML = `<span class="stars">${estrellas}</span> ${niv.txt}`;
 
   const cont = $("#qOpciones");
   cont.className = "opciones";

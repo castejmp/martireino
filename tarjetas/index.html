@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de tarjetas · Martina XV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Mulish:wght@400;600;700;800;900&family=Chewy&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="ui">
+  <header class="topbar">
+    <div class="logo-wm">
+      <img src="../assets/logo.png" alt="Martina Fifteen">
+    </div>
+    <div>
+      <h1>Generador de tarjetas</h1>
+      <p class="sub">Procesá los 200 QR del Drive y generá las tarjetas para imprenta · doble cara, listas para cortar.</p>
+    </div>
+  </header>
+
+  <section class="step">
+    <h2><span class="n">1</span> Cargá los QR</h2>
+    <div id="drop" class="drop">
+      <strong>Arrastrá los PNG acá</strong>
+      <span>o tocá para elegir los archivos del Drive descargado</span>
+      <span class="hint">Formato esperado: <code>qr-NOMBRE_APELLIDO-MESA_N.png</code></span>
+    </div>
+    <input type="file" id="files" multiple accept="image/*" hidden>
+    <div id="counts" class="counts"></div>
+    <div id="errors" class="errors"></div>
+  </section>
+
+  <section class="step">
+    <h2><span class="n">2</span> Mesa → Película</h2>
+    <p class="hint">Una línea por mesa con el formato <code>numero: Nombre</code>. Editalo si cambian los números o las películas.</p>
+    <textarea id="map" rows="20" spellcheck="false"></textarea>
+  </section>
+
+  <section class="step">
+    <h2><span class="n">3</span> Vista previa</h2>
+    <p class="hint">Así sale la primera tarjeta (frente y reverso). Si todo está bien, generá el PDF.</p>
+    <div id="preview" class="preview"></div>
+  </section>
+
+  <section class="step">
+    <h2><span class="n">4</span> Generar PDF</h2>
+    <div class="actions">
+      <label>Tarjetas por hoja
+        <select id="per">
+          <option value="4" selected>4 (90×130mm · recomendado)</option>
+          <option value="6">6 (90×85mm)</option>
+          <option value="8">8 (70×95mm)</option>
+        </select>
+      </label>
+      <button id="go" class="btn primary">📄 Generar para imprenta</button>
+      <button id="goSingles" class="btn ghost">🖼️ Descargar PNG individuales (ZIP)</button>
+    </div>
+    <p class="hint">
+      El PDF abre el diálogo de impresión: elegí <strong>Guardar como PDF</strong> (Cmd/Ctrl+P) o mandalo directo a la impresora.
+      Las hojas alternan frente y dorso — imprimí a doble cara con flip por borde largo.
+    </p>
+  </section>
+</div>
+
+<div id="sheets" class="sheets"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

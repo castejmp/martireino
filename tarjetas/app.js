@@ -156,8 +156,6 @@ function cardFront(q) {
       <div class="nombre">${escapeHTML(q.name)}</div>
       <div class="mesa">Mesa ${escapeHTML(m.nombre)}</div>
       <div class="qrwrap"><img src="${q.dataUrl}" alt="QR ${escapeHTML(q.name)}"></div>
-      <div class="inst"><b>Escaneá el QR</b> para entrar a Figus del Reino.<br>
-      Tu pulsera es tu cuenta · no hace falta instalar nada.</div>
     </div>
     <div class="divider"></div>
     <div class="bot-half">

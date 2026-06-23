@@ -23,13 +23,13 @@ const el = (tag, attrs = {}, html = "") => {
    para cambiar nombres o números. Las rarezas son las que ya usa la app
    del juego (común/especial/legendaria/dorada). */
 const DEFAULT_MAP = `1: Enredados | dorada
-2: Alicia en el País de las Maravillas | rara
+2: Moana | comun
 3: Ratatouille | comun
 4: Rey León | comun
 5: Cars | comun
 6: Monsters Inc | comun
 7: La Princesa y el Sapo | comun
-8: La Dama y el Vagabundo | comun
+8: Pocahontas | comun
 9: Peter Pan | rara
 10: Blancanieves | rara
 11: Winnie the Pooh | comun
@@ -49,6 +49,10 @@ const FRAMES = {
   epica:  "../assets/frames/legendaria.jpg",
   dorada: "../assets/frames/oro.jpg",
 };
+
+/* Carta real de cada mesa: si existe assets/cartas/MM.jpg la usamos
+   como dorso completo. Si no, cae al marco según rareza. */
+const CARTA = mesa => `../assets/cartas/${String(mesa).padStart(2, "0")}.jpg`;
 
 /* ---------------- state ---------------- */
 let qrs = [];     // [{ filename, name, mesa, dataUrl }]
@@ -168,8 +172,13 @@ function cardFront(q) {
 function cardBack(q) {
   const m = mesaMap[q.mesa] || { nombre: `Mesa ${q.mesa}`, rareza: "comun" };
   const c = el("div", { class: `card back r-${m.rareza}` });
+  /* Si hay carta real de esa mesa, la usamos como dorso completo
+     (cubre todo). El onerror cae al fallback marco+nombre. */
   c.innerHTML = `
-    <img class="frame" src="${FRAMES[m.rareza]}" alt="" crossorigin>
+    <img class="carta" src="${CARTA(q.mesa)}" alt=""
+      onload="this.closest('.card').classList.add('hascarta')"
+      onerror="this.remove()">
+    <img class="frame" src="${FRAMES[m.rareza]}" alt="">
     <div class="overlay">
       <div class="kicker">Tu mesa</div>
       <div class="pelicula">${escapeHTML(m.nombre)}</div>

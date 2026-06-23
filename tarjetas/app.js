@@ -147,10 +147,6 @@ function paintCounts() {
 }
 
 /* ---------------- preview ---------------- */
-const ICO_PERSON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a6.5 6.5 0 0 1 13 0"/></svg>`;
-const ICO_CHIP = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>`;
-const ICO_DOOR = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5"/><path d="M12 12h8m0 0-3-3m3 3-3 3"/></svg>`;
-
 function cardFront(q) {
   const m = mesaMap[q.mesa] || { nombre: `Mesa ${q.mesa}`, rareza: "comun" };
   const c = el("div", { class: "card front" });
@@ -165,13 +161,7 @@ function cardFront(q) {
     </div>
     <div class="divider"></div>
     <div class="bot-half">
-      <div class="pulsera-title"><b>¡HOLA!</b> Soy tu pulsera inteligente</div>
-      <div class="pulsera-rows">
-        <div class="prow"><span class="pico">${ICO_PERSON}</span><span>LLEVO TU NOMBRE</span></div>
-        <div class="prow"><span class="pico">${ICO_CHIP}</span><span>Y UN CHIP QUE<br>ME HACE ÚNICA</span></div>
-        <div class="prow"><span class="pico">${ICO_DOOR}</span><span>DEJAME EN LA ENTRADA<br>ANTES DE IRTE</span></div>
-      </div>
-      <div class="androled">ANDROLED <span>— TU EVENTO VIVE —</span></div>
+      <img class="pulsera-img" src="../assets/pulsera-info.png" alt="Info pulsera">
     </div>`;
   return c;
 }

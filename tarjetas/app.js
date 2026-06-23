@@ -200,8 +200,8 @@ function paintPreview() {
     return;
   }
   const q = qrs[0];
-  p.appendChild(cardFront(q));
   p.appendChild(cardBack(q));
+  p.appendChild(cardFront(q));
 }
 
 /* ---------------- preparar sheets para imprenta ---------------- */
@@ -215,25 +215,23 @@ function buildSheets() {
 
   for (let i = 0; i < qrs.length; i += per) {
     const batch = qrs.slice(i, i + per);
-    // FRENTE
+    // FRENTE: carta de la película de cada mesa
     const front = el("div", { class: cls });
     batch.forEach(q => {
       const slot = el("div", { class: "slot" });
-      slot.appendChild(cardFront(q));
+      slot.appendChild(cardBack(q));
       front.appendChild(slot);
     });
     sheetsRoot.appendChild(front);
-    // DORSO con flip por borde largo: invertir columnas dentro de cada fila
+    // DORSO: QR + nombre (flip por borde largo: invertir columnas)
     const back = el("div", { class: cls });
     for (let r = 0; r < rows; r++) {
       const row = batch.slice(r * cols, r * cols + cols);
-      // espejar el orden de la fila
       for (let k = row.length - 1; k >= 0; k--) {
         const slot = el("div", { class: "slot" });
-        slot.appendChild(cardBack(row[k]));
+        slot.appendChild(cardFront(row[k]));
         back.appendChild(slot);
       }
-      // si la última fila tiene huecos (último lote incompleto), agregar slots vacíos
       for (let k = row.length; k < cols; k++) {
         back.appendChild(el("div", { class: "slot" }));
       }
@@ -253,7 +251,7 @@ async function buildZip() {
     const q = qrs[i];
     for (const lado of ["front", "back"]) {
       sandbox.innerHTML = "";
-      const card = lado === "front" ? cardFront(q) : cardBack(q);
+      const card = lado === "front" ? cardBack(q) : cardFront(q);
       sandbox.appendChild(card);
       await new Promise(r => requestAnimationFrame(r));
       const blob = await renderToBlob(card);

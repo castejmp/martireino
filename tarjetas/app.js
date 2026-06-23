@@ -50,6 +50,10 @@ const FRAMES = {
   dorada: "../assets/frames/oro.jpg",
 };
 
+/* Carta real de cada mesa: si existe assets/cartas/MM.jpg la usamos
+   como dorso completo. Si no, cae al marco según rareza. */
+const CARTA = mesa => `../assets/cartas/${String(mesa).padStart(2, "0")}.jpg`;
+
 /* ---------------- state ---------------- */
 let qrs = [];     // [{ filename, name, mesa, dataUrl }]
 let bad = [];     // [{ filename, reason }]
@@ -168,8 +172,13 @@ function cardFront(q) {
 function cardBack(q) {
   const m = mesaMap[q.mesa] || { nombre: `Mesa ${q.mesa}`, rareza: "comun" };
   const c = el("div", { class: `card back r-${m.rareza}` });
+  /* Si hay carta real de esa mesa, la usamos como dorso completo
+     (cubre todo). El onerror cae al fallback marco+nombre. */
   c.innerHTML = `
-    <img class="frame" src="${FRAMES[m.rareza]}" alt="" crossorigin>
+    <img class="carta" src="${CARTA(q.mesa)}" alt=""
+      onload="this.closest('.card').classList.add('hascarta')"
+      onerror="this.remove()">
+    <img class="frame" src="${FRAMES[m.rareza]}" alt="">
     <div class="overlay">
       <div class="kicker">Tu mesa</div>
       <div class="pelicula">${escapeHTML(m.nombre)}</div>

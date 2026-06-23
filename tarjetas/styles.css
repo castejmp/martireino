@@ -78,6 +78,9 @@ textarea:focus{border-color:var(--magenta);box-shadow:0 0 0 3px rgba(213,13,162,
 
 .card.back{position:relative;background:#0b0820}
 .card.back .frame{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.card.back .carta{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3}
+/* Cuando la carta real cargó, escondemos marco genérico y overlay */
+.card.back.hascarta .frame,.card.back.hascarta .overlay,.card.back.hascarta .reino{display:none}
 .card.back .overlay{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;
   align-items:center;justify-content:center;text-align:center;padding:14% 12%}
 .card.back .kicker{font-family:'Mulish';font-weight:900;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--navy);opacity:.7}

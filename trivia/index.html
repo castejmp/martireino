@@ -17,7 +17,7 @@
   <section id="start" class="screen show">
     <img class="logo" src="../assets/logo.png" alt="Martina Fifteen">
     <h1 class="title">Trivia del Reino</h1>
-    <p class="subtitle">5 preguntas al azar · cada respuesta correcta vale una figu</p>
+    <p class="subtitle">5 preguntas que van de fácil a difícil · cada respuesta correcta vale una figu</p>
     <label class="field">
       <span>Nombre del participante</span>
       <input id="nombre" type="text" placeholder="Ej: Adriana Mignola" autocomplete="off">
@@ -32,7 +32,10 @@
       <div class="prog"><span id="qNum">1</span>/5</div>
     </header>
     <div class="dots" id="dots"></div>
-    <div class="peli" id="qPeli"></div>
+    <div class="qtags">
+      <div class="peli" id="qPeli"></div>
+      <div class="nivel" id="qNivel"></div>
+    </div>
     <div class="pregunta" id="qTexto"></div>
     <div class="opciones" id="qOpciones"></div>
     <button id="siguiente" class="btn primary big" disabled>Siguiente</button>

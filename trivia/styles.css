@@ -46,9 +46,18 @@ html,body{margin:0;padding:0;min-height:100%;
 .dots i.fail{background:var(--red)}
 .dots i.now{background:var(--magenta)}
 
-.peli{align-self:flex-start;font-family:'Chewy',cursive;font-size:15px;color:var(--magenta);
-  text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;
+.qtags{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.peli{font-family:'Chewy',cursive;font-size:15px;color:var(--magenta);
+  text-transform:uppercase;letter-spacing:.04em;
   background:#fff;border-radius:12px;padding:6px 14px;box-shadow:0 4px 12px rgba(29,42,74,.06)}
+.nivel{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:12px;
+  border-radius:12px;padding:6px 12px;letter-spacing:.01em;color:#fff}
+.nivel .stars{letter-spacing:1px;font-size:11px}
+.nivel.niv-1{background:#4ca36b}
+.nivel.niv-2{background:#7bb03f}
+.nivel.niv-3{background:#e0a52e}
+.nivel.niv-4{background:#e07a2e}
+.nivel.niv-5{background:#d24343}
 .pregunta{font-family:'Cormorant Garamond';font-weight:700;font-size:27px;line-height:1.18;
   color:var(--navy);margin-bottom:22px}
 
